@@ -12,9 +12,9 @@ public:
             std::exit(64);
         }
         
-        std::string outputDir = argv[1];
+        std::string output_dir = argv[1];
         
-        defineAst(outputDir, "expr", {
+        defineAst(output_dir, "Expr", {
             "Binary : Expr* left, Token operator, Expr* right",
             "Grouping : Expr* expression", 
             "Literal : std::any value",
@@ -23,10 +23,10 @@ public:
     }
 
 private:
-    static void defineAst(const std::string& outputDir, 
-                         const std::string& baseName, 
+    static void defineAst(const std::string& output_dir, 
+                         const std::string& base_name, 
                          const std::vector<std::string>& types) {
-        std::string path = outputDir + "/" + baseName + ".h";
+        std::string path = output_dir + "/" + toLowerCase(base_name) + ".h";
         std::ofstream writer(path);
         
         if (!writer) {
@@ -34,8 +34,8 @@ private:
             std::exit(1);
         }
         
-        writer << "#ifndef " << toUpperCase(baseName) << "_H" << std::endl;
-        writer << "#define " << toUpperCase(baseName) << "_H" << std::endl;
+        writer << "#ifndef " << toUpperCase(base_name) << "_H" << std::endl;
+        writer << "#define " << toUpperCase(base_name) << "_H" << std::endl;
         writer << std::endl;
         writer << "#include <any>" << std::endl;
         writer << "#include <memory>" << std::endl;
@@ -43,14 +43,14 @@ private:
         writer << std::endl;
         writer << "namespace lox {" << std::endl;
         writer << std::endl;
-        std::string className = toPascalCase(baseName);
-        writer << "class " << className << " {" << std::endl;
+        std::string class_name = base_name;
+        writer << "class " << class_name << " {" << std::endl;
         writer << "public:" << std::endl;
-        writer << "    virtual ~" << className << "() = default;" << std::endl;
+        writer << "    virtual ~" << class_name << "() = default;" << std::endl;
         writer << std::endl;
         
         // Define visitor interface
-        defineVisitor(writer, className, types);
+        defineVisitor(writer, class_name, types);
         
         // The base accept() method
         writer << "    template<typename R>" << std::endl;
@@ -60,21 +60,21 @@ private:
         
         // Generate each subclass
         for (const auto& type : types) {
-            size_t colonPos = type.find(':');
-            std::string className = trim(type.substr(0, colonPos));
-            std::string fields = trim(type.substr(colonPos + 1));
-            defineType(writer, toPascalCase(baseName), className, fields);
+            size_t colon_pos = type.find(':');
+            std::string class_name = trim(type.substr(0, colon_pos));
+            std::string fields = trim(type.substr(colon_pos + 1));
+            defineType(writer, base_name, class_name, fields);
         }
         
         writer << "} // namespace lox" << std::endl;
         writer << std::endl;
-        writer << "#endif // " << toUpperCase(baseName) << "_H" << std::endl;
+        writer << "#endif // " << toUpperCase(base_name) << "_H" << std::endl;
         
         writer.close();
     }
     
     static void defineVisitor(std::ofstream& writer, 
-                              const std::string& baseName, 
+                              const std::string& base_name, 
                               const std::vector<std::string>& types) {
         writer << "    template<typename R>" << std::endl;
         writer << "    class Visitor {" << std::endl;
@@ -82,11 +82,11 @@ private:
         writer << "        virtual ~Visitor() = default;" << std::endl;
         
         for (const auto& type : types) {
-            size_t colonPos = type.find(':');
-            std::string typeName = trim(type.substr(0, colonPos));
-            std::string paramName = toLowerCase(baseName);
-            writer << "        virtual R visit" << typeName << baseName 
-                   << "(" << typeName << "* " << paramName << ") = 0;" << std::endl;
+            size_t colon_pos = type.find(':');
+            std::string type_name = trim(type.substr(0, colon_pos));
+            std::string param_name = toLowerCase(base_name);
+            writer << "        virtual R visit" << type_name << base_name 
+                   << "(" << type_name << "* " << param_name << ") = 0;" << std::endl;
         }
         
         writer << "    };" << std::endl;
@@ -94,22 +94,22 @@ private:
     }
     
     static void defineType(std::ofstream& writer, 
-                           const std::string& baseName,
-                           const std::string& className, 
-                           const std::string& fieldList) {
-        writer << "class " << className << " : public " << baseName << " {" << std::endl;
+                           const std::string& base_name,
+                           const std::string& class_name, 
+                           const std::string& field_list) {
+        writer << "class " << class_name << " : public " << base_name << " {" << std::endl;
         writer << "public:" << std::endl;
         
         // Constructor
-        writer << "    " << className << "(" << fieldList << ")";
+        writer << "    " << class_name << "(" << field_list << ")";
         
         // Constructor initialization list
-        std::vector<std::string> fields = split(fieldList, ", ");
+        std::vector<std::string> fields = split(field_list, ", ");
         if (!fields.empty()) {
             writer << " : ";
             for (size_t i = 0; i < fields.size(); ++i) {
-                std::string fieldName = getFieldName(fields[i]);
-                writer << fieldName << "(" << fieldName << ")";
+                std::string field_name = getFieldName(fields[i]);
+                writer << field_name << "(" << field_name << ")";
                 if (i < fields.size() - 1) {
                     writer << ", ";
                 }
@@ -127,7 +127,7 @@ private:
         writer << std::endl;
         writer << "    template<typename R>" << std::endl;
         writer << "    R accept(Visitor<R>& visitor) override {" << std::endl;
-        writer << "        return visitor.visit" << className << baseName << "(this);" << std::endl;
+        writer << "        return visitor.visit" << class_name << base_name << "(this);" << std::endl;
         writer << "    }" << std::endl;
         writer << "};" << std::endl;
         writer << std::endl;
@@ -155,8 +155,8 @@ private:
     }
     
     static std::string getFieldName(const std::string& field) {
-        size_t lastSpace = field.find_last_of(' ');
-        return field.substr(lastSpace + 1);
+        size_t last_space = field.find_last_of(' ');
+        return field.substr(last_space + 1);
     }
     
     static std::string toUpperCase(const std::string& str) {
@@ -164,13 +164,6 @@ private:
         for (char& c : result) {
             c = std::toupper(c);
         }
-        return result;
-    }
-    
-    static std::string toPascalCase(const std::string& str) {
-        if (str.empty()) return str;
-        std::string result = str;
-        result[0] = std::toupper(result[0]);
         return result;
     }
     
