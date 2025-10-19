@@ -9,69 +9,66 @@ namespace lox {
 
 class Expr {
 public:
-    virtual ~Expr() = default;
-
-    template<typename R>
     class Visitor {
     public:
         virtual ~Visitor() = default;
-        virtual R visitBinaryExpr(Binary* expr) = 0;
-        virtual R visitGroupingExpr(Grouping* expr) = 0;
-        virtual R visitLiteralExpr(Literal* expr) = 0;
-        virtual R visitUnaryExpr(Unary* expr) = 0;
+        virtual std::any visitBinaryExpr(class Binary* expr) = 0;
+        virtual std::any visitGroupingExpr(class Grouping* expr) = 0;
+        virtual std::any visitLiteralExpr(class Literal* expr) = 0;
+        virtual std::any visitUnaryExpr(class Unary* expr) = 0;
     };
 
-    template<typename R>
-    virtual R accept(Visitor<R>& visitor) = 0;
+    virtual ~Expr() = default;
+    virtual std::any accept(Visitor& visitor) = 0; 
 };
 
+// ---------- Expression types ----------
 class Binary : public Expr {
 public:
-    Binary(Expr* left, Token operator, Expr* right) : left(left), operator(operator), right(right) {}
+    std::unique_ptr<Expr> left;
+    Token op;
+    std::unique_ptr<Expr> right;
 
-    Expr* left;
-    Token operator;
-    Expr* right;
+    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(op), right(std::move(right)) {}
 
-    template<typename R>
-    R accept(Visitor<R>& visitor) override {
+    std::any accept(Visitor& visitor) override {
         return visitor.visitBinaryExpr(this);
     }
 };
 
 class Grouping : public Expr {
 public:
-    Grouping(Expr* expression) : expression(expression) {}
+    std::unique_ptr<Expr> expr;
 
-    Expr* expression;
-
-    template<typename R>
-    R accept(Visitor<R>& visitor) override {
+    Grouping(std::unique_ptr<Expr> expr)
+        : expr(std::move(expr)) {}
+    
+    std::any accept(Visitor& visitor) override {
         return visitor.visitGroupingExpr(this);
     }
 };
 
 class Literal : public Expr {
 public:
-    Literal(std::any value) : value(value) {}
-
     std::any value;
 
-    template<typename R>
-    R accept(Visitor<R>& visitor) override {
+    Literal(std::any value)
+        : value(value) {}
+    
+    std::any accept(Visitor& visitor) override {
         return visitor.visitLiteralExpr(this);
     }
 };
 
 class Unary : public Expr {
 public:
-    Unary(Token operator, Expr* right) : operator(operator), right(right) {}
+    Token op;
+    std::unique_ptr<Expr> right;
 
-    Token operator;
-    Expr* right;
-
-    template<typename R>
-    R accept(Visitor<R>& visitor) override {
+    Unary(Token op, std::unique_ptr<Expr> right)
+        : op(op), right(std::move(right)) {}
+    std::any accept(Visitor& visitor) override {
         return visitor.visitUnaryExpr(this);
     }
 };
