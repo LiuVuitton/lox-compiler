@@ -7,6 +7,11 @@
 
 namespace lox {
 
+class Binary;
+class Grouping;
+class Literal;
+class Unary;
+
 class Expr {
 public:
     class Visitor {
@@ -19,7 +24,7 @@ public:
     };
 
     virtual ~Expr() = default;
-    virtual std::any accept(Visitor& visitor) = 0; 
+    virtual std::any accept(Visitor& visitor) = 0;
 };
 
 // ---------- Expression types ----------
@@ -43,7 +48,7 @@ public:
 
     Grouping(std::unique_ptr<Expr> expr)
         : expr(std::move(expr)) {}
-    
+
     std::any accept(Visitor& visitor) override {
         return visitor.visitGroupingExpr(this);
     }
@@ -55,7 +60,7 @@ public:
 
     Literal(std::any value)
         : value(value) {}
-    
+
     std::any accept(Visitor& visitor) override {
         return visitor.visitLiteralExpr(this);
     }
@@ -68,6 +73,7 @@ public:
 
     Unary(Token op, std::unique_ptr<Expr> right)
         : op(op), right(std::move(right)) {}
+
     std::any accept(Visitor& visitor) override {
         return visitor.visitUnaryExpr(this);
     }
