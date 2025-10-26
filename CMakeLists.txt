@@ -4,10 +4,11 @@ project(clox)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add all source files
+# Main executable source files (excluding test files)
 file(GLOB SOURCES "src/*.cpp")
+list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/test_ast.cpp")
 
-# Create executable
+# Create main executable
 add_executable(clox ${SOURCES})
 
 # Include directories
