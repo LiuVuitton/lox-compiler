@@ -1,5 +1,6 @@
 #include "parser.h"
-#include "lox.h"  // already provides Lox::error(token, message)
+#include "token_type.h"
+#include "lox.h"
 
 namespace lox {
 
@@ -130,7 +131,7 @@ const Token& Parser::consume(TokenType type, const std::string& message) {
 }
 
 Parser::ParseError Parser::error(const Token& token, const std::string& message) {
-    error(token, message);  // uses your existing global error reporter
+    ::lox::error(token, message);  // uses your existing global error reporter
     return ParseError(message);
 }
 

@@ -3,6 +3,9 @@
 #include "lox.h"
 #include "scanner.h"
 #include "token.h"
+#include "scanner.h"
+#include "parser.h"
+#include "ast_printer.h"
 
 namespace lox {
 
@@ -34,19 +37,36 @@ void runPrompt() {
 void run(const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
+    Parser parser = Parser(tokens);
+    std::unique_ptr<Expr> expression = parser.parse();
+
+    if (hadError) return;
+    if (expression) {
+        std::cout << AstPrinter().print(*expression) << "\n";
+    }
 
     // For now just print the tokens
-    for (const auto& token : tokens) {
-        std::cout << token.toString() << "\n";
-    }
+    // for (const auto& token : tokens) {
+    //     std::cout << token.toString() << "\n";
+    //}
+
+
 }
 
 void error(int line, const std::string& message) {
     report(line, "", message);
 }
 
+void error(const Token& token, const std::string& message) {
+    if (token.type == TokenType::END_OF_FILE) {
+        report(token.line, " at end", message);
+    } else {
+        report(token.line, " at '" + token.lexeme + "'", message);
+    }
+}
+
 void report(int line, const std::string& where, const std::string& message) {
-    std::cerr << "[line " << line << "] Error" << where << ": " << message;
+    std::cerr << "[line " << line << "] Error" << where << ": " << message << std::endl;
     hadError = true;
 }
 
