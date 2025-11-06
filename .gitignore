@@ -1,0 +1,68 @@
+# ---- Compiler build artifacts ----
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+*.out
+*.app
+
+# ---- Build directories ----
+/build/
+/Build/
+/bin/
+/Bin/
+/lib/
+/Lib/
+/dist/
+/CMakeFiles/
+/cmake-build-*/
+
+# ---- CMake generated files ----
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+compile_commands.json
+
+# ---- Debugging / profiling files ----
+*.dSYM/
+*.gcda
+*.gcno
+*.gcov
+*.prof
+*.profraw
+*.swp
+*.swo
+*.stackdump
+
+# ---- Logs / temporary files ----
+*.log
+*.tmp
+*.temp
+*.bak
+*.old
+*.pid
+
+# ---- Editor backups ----
+*~
+*.orig
+
+# =========================================================
+#   VS Code specific
+# =========================================================
+
+# Ignore all VSCode settings by default
+.vscode/*
+
+# But keep shared workspace config
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# VSCode local history and backups
+.history/
+.vscode-test/
+*.code-workspace
