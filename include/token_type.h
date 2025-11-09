@@ -36,7 +36,7 @@
     X(AND) \
     X(CLASS) \
     X(ELSE) \
-    X(FALSE_) \
+    X(FALSE) \
     X(FUN) \
     X(FOR) \
     X(IF) \
@@ -46,7 +46,7 @@
     X(RETURN) \
     X(SUPER) \
     X(THIS) \
-    X(TRUE_) \
+    X(TRUE) \
     X(VAR) \
     X(WHILE) \
     X(END_OF_FILE)
