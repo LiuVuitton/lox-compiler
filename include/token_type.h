@@ -3,9 +3,6 @@
 
 #include <string>
 
-//
-// Step 1: Define all token names in a single macro list
-//
 #define TOKEN_TYPE_LIST \
     /* Single-character tokens */ \
     X(LEFT_PAREN) \
@@ -51,18 +48,12 @@
     X(WHILE) \
     X(END_OF_FILE)
 
-//
-// Step 2: Define the enum itself
-//
 enum class TokenType {
 #define X(name) name,
     TOKEN_TYPE_LIST
 #undef X
 };
 
-//
-// Step 3: Declare the to_string function
-//
 std::string to_string(TokenType type);
 
 #endif // TOKEN_TYPE_H
