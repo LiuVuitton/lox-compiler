@@ -4,7 +4,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc > 1) {
-        std::cout << "Usage: clox [script]" << "\n";
+        std::cout << "Usage: clox [script]\n";
         std::exit(64);
     }
     else if (argc == 1) {
