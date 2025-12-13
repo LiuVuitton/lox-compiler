@@ -48,7 +48,7 @@ void Scanner::scanToken() {
             break;
         case '/':
             if (match('/')) {
-                while (peek() != '\n' && isAtEnd()) advance();
+                while (peek() != '\n' && !isAtEnd()) advance();
             }
             else {
                 addToken(TokenType::SLASH);
@@ -71,7 +71,7 @@ void Scanner::scanToken() {
                 identifier();
             }
             else {
-                error(line, "Unexpected character.");
+                Lox::error(line, "Unexpected character.");
             }
             break;
     }
@@ -87,7 +87,7 @@ void Scanner::addToken(TokenType type) {
 }
 
 void Scanner::addToken(TokenType type, std::any literal) {
-    std::string text = source.substr(start, current - start + 1);
+    std::string text = source.substr(start, current - start);
     tokens.emplace_back(Token(type, text, literal, line));
 }
 
@@ -111,7 +111,7 @@ void Scanner::string() {
     }
 
     if (isAtEnd()) {
-        error(line, "Unterminated string.");
+        Lox::error(line, "Unterminated string.");
         return;
     }
 
@@ -137,7 +137,7 @@ void Scanner::number() {
         while (isDigit(peek())) advance();
     }
 
-    addToken(TokenType::NUMBER, std::stod(source.substr(start, current - start + 1)));
+    addToken(TokenType::NUMBER, std::stod(source.substr(start, current - start)));
 }
 
 char Scanner::peekNext() {
@@ -148,7 +148,7 @@ char Scanner::peekNext() {
 void Scanner::identifier() {
     while (isAlphaNumeric(peek())) advance();
 
-    std::string text = source.substr(start, current - start + 1);
+    std::string text = source.substr(start, current - start);
     TokenType type;
     auto it = keywords.find(text);
     if (it == keywords.end()) {

@@ -2,10 +2,11 @@
 #define LOX_H
 
 #include <string>
+#include "token.h"
 
 namespace Lox {
     
-bool had_error = false;
+extern bool had_error;
 
 void runFile(const std::string& path);
 void runPrompt();

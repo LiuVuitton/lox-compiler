@@ -1,67 +1,81 @@
 #ifndef EXPR_H
 #define EXPR_H
 
-#include <memory>
-#include <string>
-#include <vector>
 #include <any>
-#include <token.h>
+#include <memory>
+#include "token.h"
 
 class Binary;
 class Grouping;
 class Literal;
 class Unary;
 
-class ExprVisitor {
-public:
-    virtual ~ExprVisitor() = default;
-
-    virtual std::any visitBinary(const class Binary& expr) = 0;
-    virtual std::any visitGrouping(const class Grouping& expr) = 0;
-    virtual std::any visitLiteral(const class Literal& expr) = 0;
-    virtual std::any visitUnary(const class Unary& expr) = 0;
-};
-
 class Expr {
 public:
-    virtual ~Expr() = default;
+    class Visitor {
+    public:
+        virtual ~Visitor() = default;
+        virtual std::any visitBinaryExpr(Binary* expr) = 0;
+        virtual std::any visitGroupingExpr(Grouping* expr) = 0;
+        virtual std::any visitLiteralExpr(Literal* expr) = 0;
+        virtual std::any visitUnaryExpr(Unary* expr) = 0;
+    };
 
-    virtual std::any accept(ExprVisitor& visitor) const = 0;
+    virtual ~Expr() = default;
+    virtual std::any accept(Visitor& visitor) = 0;
 };
 
+// ---------- Expression types ----------
 class Binary : public Expr {
 public:
-    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
-    std::any accept(ExprVisitor& visitor) const override;
+    std::unique_ptr<Expr> left;
+    Token op;
+    std::unique_ptr<Expr> right;
 
-    const std::unique_ptr<Expr> left;
-    const Token op;
-    const std::unique_ptr<Expr> right;
+    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+        : left(std::move(left)), op(op), right(std::move(right)) {}
+
+    std::any accept(Visitor& visitor) override {
+        return visitor.visitBinaryExpr(this);
+    }
 };
 
 class Grouping : public Expr {
 public:
-    Grouping(std::unique_ptr<Expr> expression);
-    std::any accept(ExprVisitor& visitor) const override;
+    std::unique_ptr<Expr> expr;
 
-    const std::unique_ptr<Expr> expression;
+    Grouping(std::unique_ptr<Expr> expr)
+        : expr(std::move(expr)) {}
+
+    std::any accept(Visitor& visitor) override {
+        return visitor.visitGroupingExpr(this);
+    }
 };
 
 class Literal : public Expr {
 public:
-    Literal(std::any value);
-    std::any accept(ExprVisitor& visitor) const override;
+    std::any value;
 
-    const std::any value;
+    Literal(std::any value)
+        : value(value) {}
+
+    std::any accept(Visitor& visitor) override {
+        return visitor.visitLiteralExpr(this);
+    }
 };
 
 class Unary : public Expr {
 public:
-    Unary(Token op, std::unique_ptr<Expr> right);
-    std::any accept(ExprVisitor& visitor) const override;
+    Token op;
+    std::unique_ptr<Expr> right;
 
-    const Token op;
-    const std::unique_ptr<Expr> right;
+    Unary(Token op, std::unique_ptr<Expr> right)
+        : op(op), right(std::move(right)) {}
+
+    std::any accept(Visitor& visitor) override {
+        return visitor.visitUnaryExpr(this);
+    }
 };
+
 
 #endif // EXPR_H

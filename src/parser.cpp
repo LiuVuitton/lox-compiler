@@ -72,7 +72,7 @@ std::unique_ptr<Expr> Parser::unary() {
     if (match({TokenType::BANG, TokenType::MINUS})) {
         Token op = previous();
         std::unique_ptr<Expr> right = unary();
-        return std::make_unique<Unary>(op, right);
+        return std::make_unique<Unary>(op, std::move(right));
     }
     return primary();
 }
@@ -80,9 +80,12 @@ std::unique_ptr<Expr> Parser::unary() {
 std::unique_ptr<Expr> Parser::primary() {
     if (match({TokenType::FALSE})) return std::make_unique<Literal>(false);
     if (match({TokenType::TRUE})) return std::make_unique<Literal>(true);
-    if (match({TokenType::NIL})) return std::make_unique<Literal>({});
+    if (match({TokenType::NIL})) return std::make_unique<Literal>(std::any{});
     if (match({TokenType::NUMBER, TokenType::STRING})) {
         return std::make_unique<Literal>(previous().literal);
+    }
+    if (match({TokenType::IDENTIFIER})) {
+        return std::make_unique<Literal>(previous().lexeme);
     }
     if (match({TokenType::LEFT_PAREN})) {
         std::unique_ptr<Expr> expr = expression();

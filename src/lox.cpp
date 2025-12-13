@@ -4,6 +4,7 @@
 #include "token_type.h"
 #include "expr.h"
 #include "parser.h"
+#include "ast_printer.h"
 
 #include <iostream>
 #include <fstream>
@@ -13,6 +14,8 @@
 #include <memory>
 
 namespace Lox {
+
+bool had_error = false;
 
 void runFile(const std::string& path) {
     std::ifstream file(path);
@@ -55,6 +58,8 @@ void run(const std::string& source) {
 
     // Stop if there was a syntax error
     if (Lox::had_error) return;
+
+    std::cout << AstPrinter().print(expression.get()) << "\n";
 }
 
 void error(int line, const std::string& message) {

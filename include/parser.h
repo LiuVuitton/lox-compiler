@@ -10,6 +10,8 @@
 #include <stdexcept>
 #include <string>
 
+struct ParseError {};
+
 class Parser {
 public:
     Parser(std::vector<Token>& tokens);
@@ -36,8 +38,5 @@ private:
     ParseError error(Token token, const std::string& message);
     void synchronize();
 };
-
-struct ParseError {};
-
 
 #endif // PARSER_H
