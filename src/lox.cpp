@@ -8,11 +8,11 @@
 #include <string>
 #include <vector>
 
-void runFile(std::string path) {
+void runFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
         std::cerr << "Could not open file: " << path << std::endl;
-        exit(64); // Exit code like in the book
+        exit(64);
     }
 
     std::stringstream buffer;
@@ -36,7 +36,7 @@ void runPrompt() {
     }
 }
 
-void run(std::string source) {
+void run(const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
 
@@ -46,11 +46,11 @@ void run(std::string source) {
     }
 }
 
-void error(int line, std::string message) {
+void error(int line, const std::string& message) {
     report(line, "", message);
 }
 
-void report(int line, std::string where, std::string message) {
+void report(int line, const std::string& where, const std::string& message) {
     std::cout << "[line " << line << "] Error" << where << ": " << message << "\n";
     had_error = true; 
 }

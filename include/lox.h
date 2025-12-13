@@ -5,10 +5,10 @@
 
 bool had_error = false;
 
-void runFile(std::string path);
+void runFile(const std::string& path);
 void runPrompt();
-void run(std::string source);
-void error(int line, std::string message);
-void report(int line, std::string where, std::string message);
+void run(const std::string& source);
+void error(int line, const std::string& message);
+void report(int line, const std::string& where, const std::string& message);
 
 #endif // LOX_H
