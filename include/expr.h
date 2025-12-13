@@ -31,20 +31,20 @@ public:
 
 class Binary : public Expr {
 public:
-    Binary(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right);
+    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
     std::any accept(ExprVisitor& visitor) const override;
 
-    const std::shared_ptr<Expr> left;
+    const std::unique_ptr<Expr> left;
     const Token op;
-    const std::shared_ptr<Expr> right;
+    const std::unique_ptr<Expr> right;
 };
 
 class Grouping : public Expr {
 public:
-    Grouping(std::shared_ptr<Expr> expression);
+    Grouping(std::unique_ptr<Expr> expression);
     std::any accept(ExprVisitor& visitor) const override;
 
-    const std::shared_ptr<Expr> expression;
+    const std::unique_ptr<Expr> expression;
 };
 
 class Literal : public Expr {
@@ -57,11 +57,11 @@ public:
 
 class Unary : public Expr {
 public:
-    Unary(Token op, std::shared_ptr<Expr> right);
+    Unary(Token op, std::unique_ptr<Expr> right);
     std::any accept(ExprVisitor& visitor) const override;
 
     const Token op;
-    const std::shared_ptr<Expr> right;
+    const std::unique_ptr<Expr> right;
 };
 
 #endif // EXPR_H

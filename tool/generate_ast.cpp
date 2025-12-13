@@ -98,8 +98,6 @@ void defineClassImpl(std::ofstream& cpp,
                      const std::string& className,
                      const std::string& fieldList)
 {
-    cpp << "#include <expr.h>\n\n";
-
     // Constructor
     cpp << className << "::" << className << "(" << fieldList << ")";
     std::vector<std::string> fields_raw;
@@ -166,6 +164,9 @@ void defineAst(const std::string& includeDir,
     header << "    virtual std::any accept(" << baseName << "Visitor& visitor) const = 0;\n";
     header << "};\n\n";
 
+    
+    cpp << "#include <expr.h>\n\n";
+
     // ---- Subclasses ----
     for (auto t : types) {
         size_t colon = t.find(':');
@@ -199,10 +200,10 @@ int main(int argc, char* argv[])
     std::string src_dir = argv[2];
 
     defineAst(include_dir, src_dir, "Expr", {
-        "Binary   : std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right",
-        "Grouping : std::shared_ptr<Expr> expression",
+        "Binary   : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
+        "Grouping : std::unique_ptr<Expr> expression",
         "Literal  : std::any value",
-        "Unary    : Token op, std::shared_ptr<Expr> right"
+        "Unary    : Token op, std::unique_ptr<Expr> right"
     });
 
     return 0;
