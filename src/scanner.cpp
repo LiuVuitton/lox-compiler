@@ -2,8 +2,8 @@
 #include "token_type.h"
 #include "lox.h"
 
-Scanner::Scanner(std::string source)
-    : source(source) {};
+Scanner::Scanner(const std::string& source)
+    : source(std::move(source)) {};
 
 
 std::vector<Token> Scanner::scanTokens() {
@@ -46,6 +46,14 @@ void Scanner::scanToken() {
         case '>':
             addToken(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER);
             break;
+        case '/':
+            if (match('/')) {
+                while (peek() != '\n' && isAtEnd()) advance();
+            }
+            else {
+                addToken(TokenType::SLASH);
+            }
+            break;
         case ' ':
         case '\r':
         case '\t':
@@ -54,10 +62,13 @@ void Scanner::scanToken() {
         case '\n':
             ++line;
             break;
-        
+        case '"': string(); break;
         default:
             if (isDigit(c)) {
                 number();
+            }
+            else if (isAlpha(c)) {
+                identifier();
             }
             else {
                 error(line, "Unexpected character.");
@@ -72,7 +83,7 @@ char Scanner::advance() {
 }
 
 void Scanner::addToken(TokenType type) {
-    addToken(type, std::any{});
+    addToken(type, {});
 }
 
 void Scanner::addToken(TokenType type, std::any literal) {
@@ -107,7 +118,7 @@ void Scanner::string() {
     // The closing ".
     advance();
     // Trim the surrounding quotes.
-    std::string value = source.substr(start + 1, current - start - 1);
+    std::string value = source.substr(start + 1, current - start - 1); // Double checck that this trims correctly
     addToken(TokenType::STRING, value);
 }
 
@@ -126,7 +137,7 @@ void Scanner::number() {
         while (isDigit(peek())) advance();
     }
 
-    addToken(TokenType::NUMBER, std::stof(source.substr(start, current - start + 1)));
+    addToken(TokenType::NUMBER, std::stod(source.substr(start, current - start + 1)));
 }
 
 char Scanner::peekNext() {
@@ -146,7 +157,7 @@ void Scanner::identifier() {
     else {
         type = it->second;
     }
-    addToken(TokenType::IDENTIFIER);
+    addToken(type);
 }
 
 bool Scanner::isAlpha(char c) {
