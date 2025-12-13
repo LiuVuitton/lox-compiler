@@ -5,6 +5,7 @@
 #include "expr.h"
 #include "parser.h"
 #include "ast_printer.h"
+#include "runtime_error.h"
 
 #include <iostream>
 #include <fstream>
@@ -16,6 +17,7 @@
 namespace Lox {
 
 bool had_error = false;
+bool had_runtime_error = false;
 
 void runFile(const std::string& path) {
     std::ifstream file(path);
@@ -30,8 +32,11 @@ void runFile(const std::string& path) {
 
     run(source);
 
-    if (Lox::had_error) {
+    if (had_error) {
         exit(65);
+    }
+    if (had_runtime_error) {
+        exit(70);
     }
 }
 
@@ -41,7 +46,7 @@ void runPrompt() {
         std::cout << "> ";
         if (!std::getline(std::cin, line)) break; // EOF (Ctrl+D)
         run(line);
-        Lox::had_error = false;
+        had_error = false;
     }
 }
 
@@ -57,7 +62,8 @@ void run(const std::string& source) {
     }
 
     // Stop if there was a syntax error
-    if (Lox::had_error) return;
+    if (had_error) return;
+    interpreter.interpret(expression.get());
 
     std::cout << AstPrinter().print(expression.get()) << "\n";
 }
@@ -68,7 +74,7 @@ void error(int line, const std::string& message) {
 
 void report(int line, const std::string& where, const std::string& message) {
     std::cout << "[line " << line << "] Error" << where << ": " << message << "\n";
-    Lox::had_error = true; 
+    had_error = true; 
 }
 
 void error(Token token, const std::string& message) {
@@ -78,6 +84,11 @@ void error(Token token, const std::string& message) {
     else {
         report(token.line, " at " + token.lexeme + " ", message);
     }
+}
+
+void runtimeError(const RuntimeError& error) {
+    std::cout << error.what() << " \n[line " << error.token.line << "]\n";
+    had_runtime_error = true;
 }
 
 } // namespace Lox

@@ -38,7 +38,7 @@ public:
 
 class Grouping : public Expr {
 public:
-    std::unique_ptr<Expr> expr;
+    std::unique_ptr<Expr> expression;
 
     explicit Grouping(std::unique_ptr<Expr> expr);
 

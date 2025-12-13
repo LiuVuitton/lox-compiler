@@ -15,6 +15,8 @@ add_executable(lox
     src/token.cpp
     src/utility.cpp
     src/ast_printer.cpp
+    src/runtime_error.cpp
+    src/interpreter.cpp
 )
 
 target_include_directories(lox PRIVATE include)
