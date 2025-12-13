@@ -12,6 +12,8 @@
 #include <vector>
 #include <memory>
 
+namespace Lox {
+
 void runFile(const std::string& path) {
     std::ifstream file(path);
     if (!file.is_open()) {
@@ -52,7 +54,7 @@ void run(const std::string& source) {
     }
 
     // Stop if there was a syntax error
-    if (had_error) return;
+    if (Lox::had_error) return;
 }
 
 void error(int line, const std::string& message) {
@@ -72,3 +74,5 @@ void error(Token token, const std::string& message) {
         report(token.line, " at " + token.lexeme + " ", message);
     }
 }
+
+} // namespace Lox

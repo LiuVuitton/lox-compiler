@@ -1,5 +1,5 @@
 #ifndef LOX_H
-#define LOX_h
+#define LOX_H
 
 #include <string>
 
@@ -12,7 +12,7 @@ void runPrompt();
 void run(const std::string& source);
 void error(int line, const std::string& message);
 void report(int line, const std::string& where, const std::string& message);
-void error(Token token, const std::string& message)
+void error(Token token, const std::string& message);
 
 } // namespace Lox
 
