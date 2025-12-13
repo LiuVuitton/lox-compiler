@@ -1,12 +1,16 @@
 #include "lox.h"
 #include "token.h"
 #include "scanner.h"
+#include "token_type.h"
+#include "expr.h"
+#include "parser.h"
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <memory>
 
 void runFile(const std::string& path) {
     std::ifstream file(path);
@@ -21,7 +25,7 @@ void runFile(const std::string& path) {
 
     run(source);
 
-    if (had_error) {
+    if (Lox::had_error) {
         exit(65);
     }
 }
@@ -32,18 +36,23 @@ void runPrompt() {
         std::cout << "> ";
         if (!std::getline(std::cin, line)) break; // EOF (Ctrl+D)
         run(line);
-        had_error = false;
+        Lox::had_error = false;
     }
 }
 
 void run(const std::string& source) {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.scanTokens();
+    Parser parser(tokens);
+    std::unique_ptr<Expr> expression = parser.parse();
 
     // For now just print the tokens
     for (Token token : tokens) {
         std::cout << token.toString() << "\n";
     }
+
+    // Stop if there was a syntax error
+    if (had_error) return;
 }
 
 void error(int line, const std::string& message) {
@@ -52,5 +61,14 @@ void error(int line, const std::string& message) {
 
 void report(int line, const std::string& where, const std::string& message) {
     std::cout << "[line " << line << "] Error" << where << ": " << message << "\n";
-    had_error = true; 
+    Lox::had_error = true; 
+}
+
+void error(Token token, const std::string& message) {
+    if (token.type == TokenType::END_OF_FILE) {
+        report(token.line, " at end", message);
+    }
+    else {
+        report(token.line, " at " + token.lexeme + " ", message);
+    }
 }

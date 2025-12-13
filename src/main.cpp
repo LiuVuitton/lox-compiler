@@ -8,9 +8,9 @@ int main(int argc, char* argv[]) {
         std::exit(64);
     }
     else if (argc == 1) {
-        runFile(argv[0]);
+        Lox::runFile(argv[0]);
     }
     else {
-        runPrompt();
+        Lox::runPrompt();
     }
 }
