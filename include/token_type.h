@@ -54,6 +54,4 @@ enum class TokenType {
 #undef X
 };
 
-std::string to_string(TokenType type);
-
 #endif // TOKEN_TYPE_H

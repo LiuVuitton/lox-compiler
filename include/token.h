@@ -8,16 +8,12 @@
 
 
 struct Token {
-public:
-    TokenType type;
-    std::string lexeme;
-    std::any literal;
-    int line;
+    const TokenType type;
+    const std::string lexeme;
+    const std::any literal;
+    const int line;
     Token(TokenType type, std::string lexeme, std::any literal, int line);
-    std::string toString();
-
-private:
-    // No private members for now
+    std::string toString() const;
 };
 
 #endif // TOKEN_H
