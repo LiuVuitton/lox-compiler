@@ -25,43 +25,33 @@ public:
     virtual std::any accept(Visitor& visitor) = 0;
 };
 
-// ---------- Expression types ----------
 class Binary : public Expr {
 public:
     std::unique_ptr<Expr> left;
     Token op;
     std::unique_ptr<Expr> right;
 
-    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
-        : left(std::move(left)), op(op), right(std::move(right)) {}
+    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
 
-    std::any accept(Visitor& visitor) override {
-        return visitor.visitBinaryExpr(this);
-    }
+    std::any accept(Visitor& visitor) override;
 };
 
 class Grouping : public Expr {
 public:
     std::unique_ptr<Expr> expr;
 
-    Grouping(std::unique_ptr<Expr> expr)
-        : expr(std::move(expr)) {}
+    explicit Grouping(std::unique_ptr<Expr> expr);
 
-    std::any accept(Visitor& visitor) override {
-        return visitor.visitGroupingExpr(this);
-    }
+    std::any accept(Visitor& visitor) override;
 };
 
 class Literal : public Expr {
 public:
     std::any value;
 
-    Literal(std::any value)
-        : value(value) {}
+    explicit Literal(std::any value);
 
-    std::any accept(Visitor& visitor) override {
-        return visitor.visitLiteralExpr(this);
-    }
+    std::any accept(Visitor& visitor) override;
 };
 
 class Unary : public Expr {
@@ -69,13 +59,9 @@ public:
     Token op;
     std::unique_ptr<Expr> right;
 
-    Unary(Token op, std::unique_ptr<Expr> right)
-        : op(op), right(std::move(right)) {}
+    Unary(Token op, std::unique_ptr<Expr> right);
 
-    std::any accept(Visitor& visitor) override {
-        return visitor.visitUnaryExpr(this);
-    }
+    std::any accept(Visitor& visitor) override;
 };
-
 
 #endif // EXPR_H
