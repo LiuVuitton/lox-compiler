@@ -153,15 +153,17 @@ int main(int argc, char* argv[]) {
     std::string src_dir = argv[2];
 
     defineAst(include_dir, src_dir, "Expr", {
-        "Binary   : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
-        "Grouping : std::unique_ptr<Expr> expr",
-        "Literal  : std::any value",
-        "Unary    : Token op, std::unique_ptr<Expr> right"
+        "Binary     : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
+        "Grouping   : std::unique_ptr<Expr> expr",
+        "Literal    : std::any value",
+        "Unary      : Token op, std::unique_ptr<Expr> right",
+        "Variable   : Token name"
     });
 
     defineAst(include_dir, src_dir, "Stmt", {
         "Expression : std::unique_ptr<Expr> expr",
-        "Print      : std::unique_ptr<Expr> expr"
+        "Print      : std::unique_ptr<Expr> expr",
+        "Var        : Token name, std::unique_ptr<Expr> initializer"
     });
 
     return 0;

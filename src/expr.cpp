@@ -28,3 +28,10 @@ std::any Unary::accept(Visitor& visitor) {
     return visitor.visitUnaryExpr(this);
 }
 
+Variable::Variable(Token name)
+    : name(name) {}
+
+std::any Variable::accept(Visitor& visitor) {
+    return visitor.visitVariableExpr(this);
+}
+

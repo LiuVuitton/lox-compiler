@@ -9,6 +9,7 @@ class Binary;
 class Grouping;
 class Literal;
 class Unary;
+class Variable;
 
 class Expr {
 public:
@@ -19,6 +20,7 @@ public:
         virtual std::any visitGroupingExpr(Grouping* expr) = 0;
         virtual std::any visitLiteralExpr(Literal* expr) = 0;
         virtual std::any visitUnaryExpr(Unary* expr) = 0;
+        virtual std::any visitVariableExpr(Variable* expr) = 0;
     };
 
     virtual ~Expr() = default;
@@ -57,6 +59,14 @@ public:
     std::unique_ptr<Expr> right;
 
     explicit Unary(Token op, std::unique_ptr<Expr> right);
+    std::any accept(Visitor& visitor) override;
+};
+
+class Variable : public Expr {
+public:
+    Token name;
+
+    explicit Variable(Token name);
     std::any accept(Visitor& visitor) override;
 };
 
