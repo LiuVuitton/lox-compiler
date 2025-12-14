@@ -1,5 +1,12 @@
 #include "expr.h"
 
+Assign::Assign(Token name, std::unique_ptr<Expr> value)
+    : name(name), value(std::move(value)) {}
+
+std::any Assign::accept(Visitor& visitor) {
+    return visitor.visitAssignExpr(this);
+}
+
 Binary::Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
     : left(std::move(left)), op(op), right(std::move(right)) {}
 

@@ -72,6 +72,12 @@ std::any Interpreter::visitVarStmt(Var* stmt) {
     return std::any{};
 }
 
+std::any Interpreter::visitAssignExpr(Assign* expr) {
+    std::any value = evaluate(expr->value.get());
+    environment.assign(expr->name, value);
+    return value;
+}
+
 void Interpreter::checkNumberOperand(const Token& op, const std::any& operand) {
     if (operand.type() == typeid(double)) return;
     throw RuntimeError(op, "Operand must be a number.");

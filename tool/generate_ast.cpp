@@ -153,6 +153,7 @@ int main(int argc, char* argv[]) {
     std::string src_dir = argv[2];
 
     defineAst(include_dir, src_dir, "Expr", {
+        "Assign     : Token name, std::unique_ptr<Expr> value",
         "Binary     : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Grouping   : std::unique_ptr<Expr> expr",
         "Literal    : std::any value",

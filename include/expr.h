@@ -5,6 +5,7 @@
 #include <memory>
 #include "token.h"
 
+class Assign;
 class Binary;
 class Grouping;
 class Literal;
@@ -16,6 +17,7 @@ public:
     class Visitor {
     public:
         virtual ~Visitor() = default;
+        virtual std::any visitAssignExpr(Assign* expr) = 0;
         virtual std::any visitBinaryExpr(Binary* expr) = 0;
         virtual std::any visitGroupingExpr(Grouping* expr) = 0;
         virtual std::any visitLiteralExpr(Literal* expr) = 0;
@@ -25,6 +27,15 @@ public:
 
     virtual ~Expr() = default;
     virtual std::any accept(Visitor& visitor) = 0;
+};
+
+class Assign : public Expr {
+public:
+    Token name;
+    std::unique_ptr<Expr> value;
+
+    explicit Assign(Token name, std::unique_ptr<Expr> value);
+    std::any accept(Visitor& visitor) override;
 };
 
 class Binary : public Expr {

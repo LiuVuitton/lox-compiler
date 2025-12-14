@@ -19,6 +19,7 @@ public:
     std::any visitExpressionStmt(Expression* stmt) override;
     std::any visitPrintStmt(Print* stmt) override;
     std::any visitVarStmt(Var* stmt) override;
+    std::any visitAssignExpr(Assign* expr) override;
     void checkNumberOperand(const Token& op, const std::any& operand);
     void checkNumberOperands(const Token& op, const std::any& left, const std::any& right);
 

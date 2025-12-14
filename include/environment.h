@@ -10,7 +10,8 @@
 class Environment {
 public:
     std::any get(const Token& name);
-    void define(std::string name, std::any value);
+    void define(const std::string& name, std::any value);
+    void assign(const Token& name, std::any value);
 
 private:
     std::unordered_map<std::string, std::any> values;

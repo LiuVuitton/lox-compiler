@@ -24,7 +24,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::parse() {
 }
 
 std::unique_ptr<Expr> Parser::expression() {
-    return equality();
+    return assignment();
 }
 
 std::unique_ptr<Stmt> Parser::declaration() {
@@ -68,6 +68,24 @@ std::unique_ptr<Stmt> Parser::expressionStatement() {
     consume(TokenType::SEMICOLON, "Expect ';' after expression.");
     return std::make_unique<Expression>(std::move(expr));
 }
+
+std::unique_ptr<Expr> Parser::assignment() {
+    std::unique_ptr<Expr> expr = equality();
+
+    if (match({TokenType::EQUAL})) {
+        Token equals = previous();
+        std::unique_ptr<Expr> value = assignment();
+
+        if (auto* variable = dynamic_cast<Variable*>(expr.get())) {
+            Token name = variable->name;
+            return std::make_unique<Assign>(name, std::move(value));
+        }
+        error(equals, "Invalid assignment target.");
+    }
+
+    return expr;
+}
+
 
 std::unique_ptr<Expr> Parser::equality() {
     std::unique_ptr<Expr> expr = comparison();
