@@ -5,6 +5,7 @@
 #include "stmt.h"
 #include <any>
 #include <vector>
+#include "environment.h"
 
 class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 public:
@@ -13,13 +14,16 @@ public:
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
+    std::any visitVariableExpr(Variable* expr) override;
     std::any visitBinaryExpr(Binary* expr) override;
     std::any visitExpressionStmt(Expression* stmt) override;
     std::any visitPrintStmt(Print* stmt) override;
+    std::any visitVarStmt(Var* stmt) override;
     void checkNumberOperand(const Token& op, const std::any& operand);
     void checkNumberOperands(const Token& op, const std::any& left, const std::any& right);
 
 private:
+    Environment environment;
     std::any evaluate(Expr* expr);
     bool isTruthy(const std::any& object);
     bool isEqual(const std::any& a, const std::any& b);

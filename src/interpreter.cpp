@@ -48,6 +48,10 @@ std::any Interpreter::visitUnaryExpr(Unary* expr) {
     return std::any{};
 }
 
+std::any Interpreter::visitVariableExpr(Variable* expr) {
+    return environment.get(expr->name);
+}
+
 std::any Interpreter::visitExpressionStmt(Expression* stmt) {
     evaluate(stmt->expr.get());
     return std::any{};
@@ -56,6 +60,15 @@ std::any Interpreter::visitExpressionStmt(Expression* stmt) {
 std::any Interpreter::visitPrintStmt(Print* stmt) {
     std::any value = evaluate(stmt->expr.get());
     std::cout << stringify(value) << "\n";
+    return std::any{};
+}
+
+std::any Interpreter::visitVarStmt(Var* stmt) {
+    std::any value;
+    if (stmt->initializer != nullptr) {
+        value = evaluate(stmt->initializer.get());
+    }
+    environment.define(stmt->name.lexeme, value);
     return std::any{};
 }
 

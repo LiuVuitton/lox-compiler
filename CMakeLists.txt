@@ -18,6 +18,7 @@ add_executable(lox
     src/runtime_error.cpp
     src/interpreter.cpp
     src/stmt.cpp
+    src/environment.cpp
     
 )
 
