@@ -4,6 +4,7 @@
 #include "token.h"
 #include "token_type.h"
 #include "expr.h"
+#include "stmt.h"
 #include <memory>
 #include <vector>
 #include <initializer_list>
@@ -15,13 +16,17 @@ struct ParseError {};
 class Parser {
 public:
     Parser(std::vector<Token>& tokens);
-    std::unique_ptr<Expr> parse();
+    // std::unique_ptr<Expr> parse();
+    std::vector<std::unique_ptr<Stmt>> parse();
 
 private:
     std::vector<Token> tokens;
     int current{0};
 
     std::unique_ptr<Expr> expression();
+    std::unique_ptr<Stmt> statement();
+    std::unique_ptr<Stmt> printStatement();
+    std::unique_ptr<Stmt> expressionStatement();
     std::unique_ptr<Expr> equality();
     std::unique_ptr<Expr> comparison();
     std::unique_ptr<Expr> term();

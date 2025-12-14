@@ -2,15 +2,20 @@
 #define INTERPRETER_H
 
 #include "expr.h"
+#include "stmt.h"
 #include <any>
+#include <vector>
 
-class Interpreter : public Expr::Visitor {
+class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 public:
-    void interpret(Expr* expr);
+    // void interpret(Expr* expr);
+    void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitBinaryExpr(Binary* expr) override;
+    std::any visitExpressionStmt(Expression* stmt) override;
+    std::any visitPrintStmt(Print* stmt) override;
     void checkNumberOperand(const Token& op, const std::any& operand);
     void checkNumberOperands(const Token& op, const std::any& left, const std::any& right);
 
@@ -19,6 +24,7 @@ private:
     bool isTruthy(const std::any& object);
     bool isEqual(const std::any& a, const std::any& b);
     std::string stringify(const std::any& object);
+    void execute(Stmt* stmt);
 };
 
 #endif // INTERPRETER_H

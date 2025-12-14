@@ -137,11 +137,19 @@ int main(int argc, char* argv[]) {
         return 64;
     }
 
-    defineAst(argv[1], argv[2], "Expr", {
+    std::string include_dir = argv[1];
+    std::string src_dir = argv[2];
+
+    defineAst(include_dir, src_dir, "Expr", {
         "Binary   : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Grouping : std::unique_ptr<Expr> expr",
         "Literal  : std::any value",
         "Unary    : Token op, std::unique_ptr<Expr> right"
+    });
+
+    defineAst(include_dir, src_dir, "Stmt", {
+        "Expression : std::unique_ptr<Expr> expr",
+        "Print      : std::unique_ptr<Expr> expr"
     });
 
     return 0;

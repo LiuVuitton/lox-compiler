@@ -3,13 +3,26 @@
 #include "lox.h"
 #include <sstream>
 #include <iostream>
+#include <vector>
 
+/*
 void Interpreter::interpret(Expr* expr) {
     try {
         std::any value = evaluate(expr);
-        std::cout << stringify(value);
+        std::cout << stringify(value) << "\n";
     }
     catch (RuntimeError error) {
+        Lox::runtimeError(error);
+    }
+}
+    */
+
+void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
+    try {
+        for (const auto& statement : statements) {
+            execute(statement.get());
+        }
+    } catch (const RuntimeError& error) {
         Lox::runtimeError(error);
     }
 }
@@ -32,6 +45,17 @@ std::any Interpreter::visitUnaryExpr(Unary* expr) {
             checkNumberOperand(expr->op, right);
             return -std::any_cast<double>(right);
     }
+    return std::any{};
+}
+
+std::any Interpreter::visitExpressionStmt(Expression* stmt) {
+    evaluate(stmt->expr.get());
+    return std::any{};
+}
+
+std::any Interpreter::visitPrintStmt(Print* stmt) {
+    std::any value = evaluate(stmt->expr.get());
+    std::cout << stringify(value) << "\n";
     return std::any{};
 }
 
@@ -149,4 +173,8 @@ std::string Interpreter::stringify(const std::any& object) {
     }
 
     return "null";
+}
+
+void Interpreter::execute(Stmt* stmt) {
+    stmt->accept(*this);
 }

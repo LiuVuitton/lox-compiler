@@ -4,6 +4,7 @@
 Parser::Parser(std::vector<Token>& tokens) 
     : tokens(std::move(tokens)) {}
 
+/*
 std::unique_ptr<Expr> Parser::parse() {
     try {
         return expression();
@@ -12,9 +13,37 @@ std::unique_ptr<Expr> Parser::parse() {
         return nullptr;
     }
 }
+*/
+std::vector<std::unique_ptr<Stmt>> Parser::parse() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+    while (!isAtEnd()) {
+        statements.push_back(statement());
+    }
+
+    return statements;
+}
 
 std::unique_ptr<Expr> Parser::expression() {
     return equality();
+}
+
+std::unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::PRINT})) {
+        return printStatement();
+    }
+    return expressionStatement();
+}
+
+std::unique_ptr<Stmt> Parser::printStatement() {
+    std::unique_ptr<Expr> value = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after value.");
+    return std::make_unique<Print>(std::move(value));
+}
+
+std::unique_ptr<Stmt> Parser::expressionStatement() {
+    std::unique_ptr<Expr> expr = expression();
+    consume(TokenType::SEMICOLON, "Expect ';' after expression.");
+    return std::make_unique<Expression>(std::move(expr));
 }
 
 std::unique_ptr<Expr> Parser::equality() {
