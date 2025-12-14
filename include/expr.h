@@ -31,17 +31,15 @@ public:
     Token op;
     std::unique_ptr<Expr> right;
 
-    Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
-
+    explicit Binary(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right);
     std::any accept(Visitor& visitor) override;
 };
 
 class Grouping : public Expr {
 public:
-    std::unique_ptr<Expr> expression;
+    std::unique_ptr<Expr> expr;
 
     explicit Grouping(std::unique_ptr<Expr> expr);
-
     std::any accept(Visitor& visitor) override;
 };
 
@@ -50,7 +48,6 @@ public:
     std::any value;
 
     explicit Literal(std::any value);
-
     std::any accept(Visitor& visitor) override;
 };
 
@@ -59,8 +56,7 @@ public:
     Token op;
     std::unique_ptr<Expr> right;
 
-    Unary(Token op, std::unique_ptr<Expr> right);
-
+    explicit Unary(Token op, std::unique_ptr<Expr> right);
     std::any accept(Visitor& visitor) override;
 };
 

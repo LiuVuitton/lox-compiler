@@ -2,11 +2,12 @@
 #include "runtime_error.h"
 #include "lox.h"
 #include <sstream>
+#include <iostream>
 
 void Interpreter::interpret(Expr* expr) {
     try {
         std::any value = evaluate(expr);
-        std::cout << stringfy(value);
+        std::cout << stringify(value);
     }
     catch (RuntimeError error) {
         Lox::runtimeError(error);
@@ -18,7 +19,7 @@ std::any Interpreter::visitLiteralExpr(Literal* expr) {
 }
 
 std::any Interpreter::visitGroupingExpr(Grouping* expr) {
-    return evaluate(expr->expression.get());
+    return evaluate(expr->expr.get());
 }
 
 std::any Interpreter::visitUnaryExpr(Unary* expr) {
@@ -125,7 +126,7 @@ bool Interpreter::isEqual(const std::any& a, const std::any& b) {
     return false;
 }
 
-std::string stringify(const std::any& object) {
+std::string Interpreter::stringify(const std::any& object) {
     if (!object.has_value()) return "nil";
 
     if (object.type() == typeid(double)) {

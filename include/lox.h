@@ -4,6 +4,7 @@
 #include <string>
 #include "token.h"
 #include "interpreter.h"
+#include "runtime_error.h"
 
 namespace Lox {
 

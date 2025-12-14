@@ -16,6 +16,7 @@
 
 namespace Lox {
 
+Interpreter interpreter;
 bool had_error = false;
 bool had_runtime_error = false;
 
@@ -63,8 +64,8 @@ void run(const std::string& source) {
 
     // Stop if there was a syntax error
     if (had_error) return;
-    interpreter.interpret(expression.get());
-
+    Lox::interpreter.interpret(expression.get());
+    std::cout << "\n";
     std::cout << AstPrinter().print(expression.get()) << "\n";
 }
 
