@@ -10,7 +10,7 @@ std::any Binary::accept(Visitor& visitor) {
 
 // -------- Grouping --------
 Grouping::Grouping(std::unique_ptr<Expr> expr)
-    : expr(std::move(expr)) {}
+    : expression(std::move(expr)) {}
 
 std::any Grouping::accept(Visitor& visitor) {
     return visitor.visitGroupingExpr(this);
