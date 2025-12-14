@@ -46,10 +46,17 @@ void defineAst(const std::string& includeDir,
 
     if (!h || !cpp) throw std::runtime_error("Could not open output files");
 
-    // -------- HEADER --------
+    // ================= HEADER =================
     std::string guard = include_guard(filename);
     h << "#ifndef " << guard << "\n#define " << guard << "\n\n";
-    h << "#include <any>\n#include <memory>\n#include \"token.h\"\n\n";
+
+    h << "#include <any>\n";
+    h << "#include <memory>\n";
+    h << "#include \"token.h\"\n";
+    if (baseName != "Expr") {
+        h << "#include \"expr.h\"\n";
+    }
+    h << "\n";
 
     // Forward declarations
     for (auto& t : types) {
@@ -57,15 +64,20 @@ void defineAst(const std::string& includeDir,
     }
     h << "\n";
 
-    // Expr + Visitor
+    // Base class + Visitor
     h << "class " << baseName << " {\npublic:\n";
     h << "    class Visitor {\n    public:\n";
     h << "        virtual ~Visitor() = default;\n";
+
     for (auto& t : types) {
         std::string name = trim(t.substr(0, t.find(':')));
-        h << "        virtual std::any visit" << name
-          << "Expr(" << name << "* expr) = 0;\n";
+        h << "        virtual std::any visit"
+          << name << baseName
+          << "(" << name << "* "
+          << (baseName == "Expr" ? "expr" : "stmt")
+          << ") = 0;\n";
     }
+
     h << "    };\n\n";
     h << "    virtual ~" << baseName << "() = default;\n";
     h << "    virtual std::any accept(Visitor& visitor) = 0;\n";
@@ -95,8 +107,8 @@ void defineAst(const std::string& includeDir,
 
     h << "#endif // " << guard << "\n";
 
-    // -------- CPP --------
-    cpp << "#include \"expr.h\"\n\n";
+    // ================= CPP =================
+    cpp << "#include \"" << filename << ".h\"\n\n";
 
     for (auto& t : types) {
         auto colon = t.find(':');
@@ -126,7 +138,7 @@ void defineAst(const std::string& includeDir,
         cpp << "std::any " << className
             << "::accept(Visitor& visitor) {\n";
         cpp << "    return visitor.visit"
-            << className << "Expr(this);\n";
+            << className << baseName << "(this);\n";
         cpp << "}\n\n";
     }
 }
