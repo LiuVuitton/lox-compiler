@@ -6,9 +6,13 @@
 #include <any>
 #include <string>
 #include "token.h"
+#include <memory>
 
 class Environment {
 public:
+    std::unique_ptr<Environment> enclosing;
+    Environment();
+    Environment(std::unique_ptr<Environment> enclosing);
     std::any get(const Token& name);
     void define(const std::string& name, std::any value);
     void assign(const Token& name, std::any value);

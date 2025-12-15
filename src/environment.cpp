@@ -1,11 +1,18 @@
 #include "environment.h"
 #include "runtime_error.h"
 
+Environment::Environment()
+    : enclosing(nullptr) {}
+
+Environment::Environment(std::unique_ptr<Environment> enclosing)
+    : enclosing(std::move(enclosing)) {}
+
 std::any Environment::get(const Token& name) {
     auto it = values.find(name.lexeme);
     if (it != values.end()) {
         return it->second;
     }
+    if (enclosing) return enclosing->get(name);
     throw RuntimeError(name,
         "Undefined variable '" + name.lexeme + "'."  
     );
@@ -22,6 +29,8 @@ void Environment::assign(const Token& name, std::any value) {
         it->second = std::move(value);
         return;
     }
+
+    if (enclosing) return enclosing->assign(name, value);
 
     throw RuntimeError(name,
         "Undefined variable '" + name.lexeme + "'."
