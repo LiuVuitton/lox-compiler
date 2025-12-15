@@ -1,5 +1,6 @@
 #include "parser.h"
 #include "lox.h"
+#include "stmt.h"
 
 Parser::Parser(std::vector<Token>& tokens) 
     : tokens(std::move(tokens)) {}
@@ -39,9 +40,8 @@ std::unique_ptr<Stmt> Parser::declaration() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
-    if (match({TokenType::PRINT})) {
-        return printStatement();
-    }
+    if (match({TokenType::PRINT})) return printStatement();
+    if (match({TokenType::LEFT_BRACE})) return std::make_unique<Block>(block());
     return expressionStatement();
 }
 
@@ -68,6 +68,18 @@ std::unique_ptr<Stmt> Parser::expressionStatement() {
     consume(TokenType::SEMICOLON, "Expect ';' after expression.");
     return std::make_unique<Expression>(std::move(expr));
 }
+
+std::vector<std::unique_ptr<Stmt>> Parser::block() {
+    std::vector<std::unique_ptr<Stmt>> statements;
+
+    while (!check(TokenType::RIGHT_BRACE) && !isAtEnd()) {
+        statements.push_back(declaration());
+    }
+
+    consume(TokenType::RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
+}
+
 
 std::unique_ptr<Expr> Parser::assignment() {
     std::unique_ptr<Expr> expr = equality();

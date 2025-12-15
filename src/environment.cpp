@@ -4,7 +4,7 @@
 Environment::Environment()
     : enclosing(nullptr) {}
 
-Environment::Environment(std::unique_ptr<Environment> enclosing)
+Environment::Environment(std::shared_ptr<Environment> enclosing)
     : enclosing(std::move(enclosing)) {}
 
 std::any Environment::get(const Token& name) {

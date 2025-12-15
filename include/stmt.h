@@ -3,9 +3,11 @@
 
 #include <any>
 #include <memory>
+#include <vector>
 #include "token.h"
 #include "expr.h"
 
+class Block;
 class Expression;
 class Print;
 class Var;
@@ -15,6 +17,7 @@ public:
     class Visitor {
     public:
         virtual ~Visitor() = default;
+        virtual std::any visitBlockStmt(Block* stmt) = 0;
         virtual std::any visitExpressionStmt(Expression* stmt) = 0;
         virtual std::any visitPrintStmt(Print* stmt) = 0;
         virtual std::any visitVarStmt(Var* stmt) = 0;
@@ -22,6 +25,14 @@ public:
 
     virtual ~Stmt() = default;
     virtual std::any accept(Visitor& visitor) = 0;
+};
+
+class Block : public Stmt {
+public:
+    std::vector<std::unique_ptr<Stmt>> statements;
+
+    explicit Block(std::vector<std::unique_ptr<Stmt>> statements);
+    std::any accept(Visitor& visitor) override;
 };
 
 class Expression : public Stmt {

@@ -5,6 +5,9 @@
 #include <iostream>
 #include <vector>
 
+Interpreter::Interpreter()
+    : environment(std::make_shared<Environment>()) {}
+
 /*
 void Interpreter::interpret(Expr* expr) {
     try {
@@ -49,7 +52,7 @@ std::any Interpreter::visitUnaryExpr(Unary* expr) {
 }
 
 std::any Interpreter::visitVariableExpr(Variable* expr) {
-    return environment.get(expr->name);
+    return environment->get(expr->name);
 }
 
 std::any Interpreter::visitExpressionStmt(Expression* stmt) {
@@ -68,14 +71,19 @@ std::any Interpreter::visitVarStmt(Var* stmt) {
     if (stmt->initializer != nullptr) {
         value = evaluate(stmt->initializer.get());
     }
-    environment.define(stmt->name.lexeme, value);
+    environment->define(stmt->name.lexeme, value);
     return std::any{};
 }
 
 std::any Interpreter::visitAssignExpr(Assign* expr) {
     std::any value = evaluate(expr->value.get());
-    environment.assign(expr->name, value);
+    environment->assign(expr->name, value);
     return value;
+}
+
+std::any Interpreter::visitBlockStmt(Block* stmt) {
+    executeBlock(stmt->statements, std::make_shared<Environment>(environment));
+    return std::any{};
 }
 
 void Interpreter::checkNumberOperand(const Token& op, const std::any& operand) {
@@ -197,3 +205,23 @@ std::string Interpreter::stringify(const std::any& object) {
 void Interpreter::execute(Stmt* stmt) {
     stmt->accept(*this);
 }
+
+void Interpreter::executeBlock(
+    const std::vector<std::unique_ptr<Stmt>>& statements,
+    std::shared_ptr<Environment> newEnv
+) {
+    std::shared_ptr<Environment> previous = environment;
+    environment = std::move(newEnv);
+
+    try {
+        for (const auto& stmt : statements) {
+            execute(stmt.get());
+        }
+    } catch (...) {
+        environment = previous;
+        throw;
+    }
+
+    environment = previous;
+}
+
