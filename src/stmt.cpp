@@ -14,6 +14,13 @@ std::any Expression::accept(Visitor& visitor) {
     return visitor.visitExpressionStmt(this);
 }
 
+Function::Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body)
+    : name(name), params(params), body(std::move(body)) {}
+
+std::any Function::accept(Visitor& visitor) {
+    return visitor.visitFunctionStmt(this);
+}
+
 If::If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> then_branch, std::unique_ptr<Stmt> else_branch)
     : condition(std::move(condition)), then_branch(std::move(then_branch)), else_branch(std::move(else_branch)) {}
 

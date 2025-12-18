@@ -32,6 +32,7 @@ private:
     std::unique_ptr<Stmt> varDeclaration();
     std::unique_ptr<Stmt> whileStatement();
     std::unique_ptr<Stmt> expressionStatement();
+    std::unique_ptr<Function> function(const std::string& kind);
     std::vector<std::unique_ptr<Stmt>> block();
     std::unique_ptr<Expr> assignment();
     std::unique_ptr<Expr> logical_or();
@@ -41,6 +42,8 @@ private:
     std::unique_ptr<Expr> term();
     std::unique_ptr<Expr> factor();
     std::unique_ptr<Expr> unary();
+    std::unique_ptr<Expr> finishCall(std::unique_ptr<Expr> callee);
+    std::unique_ptr<Expr> call();
     std::unique_ptr<Expr> primary();
     bool match(std::initializer_list<TokenType> types);
     Token consume(TokenType type, const std::string& message);

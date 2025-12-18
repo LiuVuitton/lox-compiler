@@ -14,6 +14,13 @@ std::any Binary::accept(Visitor& visitor) {
     return visitor.visitBinaryExpr(this);
 }
 
+Call::Call(std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments)
+    : callee(std::move(callee)), paren(paren), arguments(std::move(arguments)) {}
+
+std::any Call::accept(Visitor& visitor) {
+    return visitor.visitCallExpr(this);
+}
+
 Grouping::Grouping(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 

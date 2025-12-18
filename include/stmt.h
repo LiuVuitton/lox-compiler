@@ -9,6 +9,7 @@
 
 class Block;
 class Expression;
+class Function;
 class If;
 class Print;
 class While;
@@ -21,6 +22,7 @@ public:
         virtual ~Visitor() = default;
         virtual std::any visitBlockStmt(Block* stmt) = 0;
         virtual std::any visitExpressionStmt(Expression* stmt) = 0;
+        virtual std::any visitFunctionStmt(Function* stmt) = 0;
         virtual std::any visitIfStmt(If* stmt) = 0;
         virtual std::any visitPrintStmt(Print* stmt) = 0;
         virtual std::any visitWhileStmt(While* stmt) = 0;
@@ -44,6 +46,16 @@ public:
     std::unique_ptr<Expr> expr;
 
     explicit Expression(std::unique_ptr<Expr> expr);
+    std::any accept(Visitor& visitor) override;
+};
+
+class Function : public Stmt {
+public:
+    Token name;
+    std::vector<Token> params;
+    std::vector<std::unique_ptr<Stmt>> body;
+
+    explicit Function(Token name, std::vector<Token> params, std::vector<std::unique_ptr<Stmt>> body);
     std::any accept(Visitor& visitor) override;
 };
 
