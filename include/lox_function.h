@@ -11,7 +11,7 @@
 
 class LoxFunction : public LoxCallable {
 public:
-    LoxFunction(std::shared_ptr<Function> declaration);
+    LoxFunction(std::shared_ptr<Function> declaration, std::shared_ptr<Environment> closure);
 
     int arity() const override;
 
@@ -22,6 +22,7 @@ public:
 
 private:
     std::shared_ptr<Function> declaration;
+    std::shared_ptr<Environment> closure;
 };
 
 #endif // LOX_FUNCTION_H
