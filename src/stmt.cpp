@@ -35,3 +35,17 @@ std::any Var::accept(Visitor& visitor) {
     return visitor.visitVarStmt(this);
 }
 
+While::While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
+    : condition(std::move(condition)), body(std::move(body)) {}
+
+std::any While::accept(Visitor& visitor) {
+    return visitor.visitWhileStmt(this);
+}
+
+Var::Var(Token name, std::unique_ptr<Expr> initializer)
+    : name(name), initializer(std::move(initializer)) {}
+
+std::any Var::accept(Visitor& visitor) {
+    return visitor.visitVarStmt(this);
+}
+

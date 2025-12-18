@@ -52,6 +52,7 @@ void defineAst(const std::string& includeDir,
 
     h << "#include <any>\n";
     h << "#include <memory>\n";
+    h << "#include <vector>";
     h << "#include \"token.h\"\n";
     if (baseName != "Expr") {
         h << "#include \"expr.h\"\n";
@@ -169,6 +170,8 @@ int main(int argc, char* argv[]) {
                      "std::unique_ptr<Stmt> then_branch, "
                      "std::unique_ptr<Stmt> else_branch",
         "Print      : std::unique_ptr<Expr> expr",
+        "Var        : Token name, std::unique_ptr<Expr> initializer",
+        "While      : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
         "Var        : Token name, std::unique_ptr<Expr> initializer"
     });
 
