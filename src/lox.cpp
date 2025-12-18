@@ -56,18 +56,13 @@ void run(const std::string& source) {
     std::vector<Token> tokens = scanner.scanTokens();
     Parser parser(tokens);
     std::vector<std::unique_ptr<Stmt>> statements = parser.parse();
-    // std::unique_ptr<Expr> expression = parser.parse();
-
-    // For now just print the tokens
+    
     for (Token token : tokens) {
         std::cout << token.toString() << "\n";
     }
 
-    // Stop if there was a syntax error
     if (had_error) return;
-    Lox::interpreter.interpret(statements);
-    // std::cout << "\n";
-    // std::cout << AstPrinter().print(expression.get()) << "\n";
+    Lox::interpreter.interpret(std::move(statements));
 }
 
 void error(int line, const std::string& message) {

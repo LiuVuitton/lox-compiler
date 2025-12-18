@@ -12,7 +12,7 @@
 
 Interpreter::Interpreter()
     : globals(std::make_shared<Environment>()),
-      environment(globals) 
+      environment(globals)
 {
     globals->define("clock", std::make_any<std::shared_ptr<LoxCallable>>(
         std::make_shared<NativeFunction>(
@@ -27,9 +27,11 @@ Interpreter::Interpreter()
 }
 
 
-void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
+void Interpreter::interpret(std::vector<std::unique_ptr<Stmt>> statements) {
     try {
-        for (const auto& statement : statements) {
+        storedAst.push_back(std::move(statements));
+        
+        for (const auto& statement : storedAst.back()) {
             execute(statement.get());
         }
     } catch (const RuntimeError& error) {
@@ -198,7 +200,6 @@ std::any Interpreter::visitBinaryExpr(Binary* expr) {
 
 std::any Interpreter::visitCallExpr(Call* expr) {
     std::any calleeAny = evaluate(expr->callee.get());
-
 
     std::shared_ptr<LoxCallable> function;
     try {

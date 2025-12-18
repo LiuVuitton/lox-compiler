@@ -10,21 +10,14 @@
 
 class LoxFunction : public LoxCallable {
 public:
-    LoxFunction(
-        Token name,
-        std::vector<Token> params, 
-        std::vector<std::unique_ptr<Stmt>> body,
-        std::shared_ptr<Environment> closure
-    );
+    LoxFunction(Function* declaration, std::shared_ptr<Environment> closure);
 
     int arity() const override;
     std::any call(Interpreter& interpreter, const std::vector<std::any>& arguments) override;
     std::string toString() const override;
 
 private:
-    Token name;
-    std::vector<Token> params;
-    std::vector<std::unique_ptr<Stmt>> body;
+    std::shared_ptr<Function> declaration;
     std::shared_ptr<Environment> closure;
 };
 

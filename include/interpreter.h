@@ -11,7 +11,7 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 public:
     std::shared_ptr<Environment> globals;
     Interpreter();
-    void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
+    void interpret(std::vector<std::unique_ptr<Stmt>> statements);
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
@@ -37,6 +37,7 @@ public:
 
 private:
     std::shared_ptr<Environment> environment;
+    std::vector<std::vector<std::unique_ptr<Stmt>>> storedAst;
     std::any evaluate(Expr* expr);
     bool isTruthy(const std::any& object);
     bool isEqual(const std::any& a, const std::any& b);

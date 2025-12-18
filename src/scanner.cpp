@@ -57,7 +57,6 @@ void Scanner::scanToken() {
         case ' ':
         case '\r':
         case '\t':
-            // Ignore whitespace.
             break;
         case '\n':
             ++line;
@@ -115,10 +114,8 @@ void Scanner::string() {
         return;
     }
 
-    // The closing ".
     advance();
-    // Trim the surrounding quotes.
-    std::string value = source.substr(start + 1, current - start - 1); // Double checck that this trims correctly
+    std::string value = source.substr(start + 1, current - start - 2);
     addToken(TokenType::STRING, value);
 }
 
@@ -131,7 +128,6 @@ void Scanner::number() {
 
     // Look for a fractional part.
     if (peek() == '.' && isDigit(peekNext())) {
-        // Consume the "."
         advance();
 
         while (isDigit(peek())) advance();
