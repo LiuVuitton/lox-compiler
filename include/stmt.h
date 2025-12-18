@@ -3,12 +3,12 @@
 
 #include <any>
 #include <memory>
-#include <vector>
 #include "token.h"
 #include "expr.h"
 
 class Block;
 class Expression;
+class If;
 class Print;
 class Var;
 
@@ -19,6 +19,7 @@ public:
         virtual ~Visitor() = default;
         virtual std::any visitBlockStmt(Block* stmt) = 0;
         virtual std::any visitExpressionStmt(Expression* stmt) = 0;
+        virtual std::any visitIfStmt(If* stmt) = 0;
         virtual std::any visitPrintStmt(Print* stmt) = 0;
         virtual std::any visitVarStmt(Var* stmt) = 0;
     };
@@ -40,6 +41,16 @@ public:
     std::unique_ptr<Expr> expr;
 
     explicit Expression(std::unique_ptr<Expr> expr);
+    std::any accept(Visitor& visitor) override;
+};
+
+class If : public Stmt {
+public:
+    std::unique_ptr<Expr> condition;
+    std::unique_ptr<Stmt> then_branch;
+    std::unique_ptr<Stmt> else_branch;
+
+    explicit If(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> then_branch, std::unique_ptr<Stmt> else_branch);
     std::any accept(Visitor& visitor) override;
 };
 

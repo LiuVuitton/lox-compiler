@@ -40,9 +40,24 @@ std::unique_ptr<Stmt> Parser::declaration() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::LEFT_BRACE})) return std::make_unique<Block>(block());
     return expressionStatement();
+}
+
+std::unique_ptr<Stmt> Parser::ifStatement() {
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'if'.");
+    std::unique_ptr<Expr> condition = expression();
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after if condition.");
+
+    std::unique_ptr<Stmt> then_branch = statement();
+    std::unique_ptr<Stmt> else_branch;
+    if (match({TokenType::ELSE})) {
+        else_branch = statement();
+    }
+
+    return std::make_unique<Stmt>(condition, then_branch, else_branch);
 }
 
 std::unique_ptr<Stmt> Parser::printStatement() {

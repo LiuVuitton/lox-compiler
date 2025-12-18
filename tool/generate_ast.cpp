@@ -164,9 +164,13 @@ int main(int argc, char* argv[]) {
     defineAst(include_dir, src_dir, "Stmt", {
         "Block      : std::vector<std::unique_ptr<Stmt>> statements",
         "Expression : std::unique_ptr<Expr> expr",
+        "If         : std::unique_ptr<Expr> condition, "
+                     "std::unique_ptr<Stmt> then_branch, "
+                     "std::unique_ptr<Stmt> else_branch",
         "Print      : std::unique_ptr<Expr> expr",
         "Var        : Token name, std::unique_ptr<Expr> initializer"
     });
+
 
     return 0;
 }

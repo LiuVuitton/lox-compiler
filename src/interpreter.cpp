@@ -60,6 +60,16 @@ std::any Interpreter::visitExpressionStmt(Expression* stmt) {
     return std::any{};
 }
 
+std::any Interpreter::visitIfStmt(If* stmt) {
+    if (isTruthy(evaluate(stmt->condition.get()))) {
+        execute(stmt->then_branch.get());
+    }
+    else if (stmt->else_branch) {
+        execute(stmt->else_branch.get());
+    }
+    return std::any{};
+}
+
 std::any Interpreter::visitPrintStmt(Print* stmt) {
     std::any value = evaluate(stmt->expr.get());
     std::cout << stringify(value) << "\n";
