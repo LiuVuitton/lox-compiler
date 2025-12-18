@@ -13,6 +13,7 @@ public:
     // void interpret(Expr* expr);
     void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
     std::any visitLiteralExpr(Literal* expr) override;
+    std::any visitLogicalExpr(Logical* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitVariableExpr(Variable* expr) override;

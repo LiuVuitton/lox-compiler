@@ -3,6 +3,7 @@
 
 #include <any>
 #include <memory>
+#include <vector>
 #include "token.h"
 #include "expr.h"
 

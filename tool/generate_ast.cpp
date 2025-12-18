@@ -157,6 +157,7 @@ int main(int argc, char* argv[]) {
         "Binary     : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Grouping   : std::unique_ptr<Expr> expr",
         "Literal    : std::any value",
+        "Logical    : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Unary      : Token op, std::unique_ptr<Expr> right",
         "Variable   : Token name"
     });

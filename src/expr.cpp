@@ -28,6 +28,13 @@ std::any Literal::accept(Visitor& visitor) {
     return visitor.visitLiteralExpr(this);
 }
 
+Logical::Logical(std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right)
+    : left(std::move(left)), op(op), right(std::move(right)) {}
+
+std::any Logical::accept(Visitor& visitor) {
+    return visitor.visitLogicalExpr(this);
+}
+
 Unary::Unary(Token op, std::unique_ptr<Expr> right)
     : op(op), right(std::move(right)) {}
 

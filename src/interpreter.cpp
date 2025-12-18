@@ -34,6 +34,19 @@ std::any Interpreter::visitLiteralExpr(Literal* expr) {
     return expr->value;
 }
 
+std::any Interpreter::visitLogicalExpr(Logical* expr) {
+    std::any left = evaluate(expr->left.get());
+
+    if (expr->op.type == TokenType::OR) {
+        if (isTruthy(left)) return left;
+    }
+    else {
+        if (!isTruthy(left)) return left;
+    }
+    
+    return evaluate(expr->right.get());
+}
+
 std::any Interpreter::visitGroupingExpr(Grouping* expr) {
     return evaluate(expr->expr.get());
 }

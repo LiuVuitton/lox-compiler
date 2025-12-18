@@ -57,8 +57,13 @@ std::unique_ptr<Stmt> Parser::ifStatement() {
         else_branch = statement();
     }
 
-    return std::make_unique<Stmt>(condition, then_branch, else_branch);
+    return std::make_unique<If>(
+        std::move(condition),
+        std::move(then_branch),
+        std::move(else_branch)
+    );
 }
+
 
 std::unique_ptr<Stmt> Parser::printStatement() {
     std::unique_ptr<Expr> value = expression();
@@ -97,7 +102,7 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
 
 
 std::unique_ptr<Expr> Parser::assignment() {
-    std::unique_ptr<Expr> expr = equality();
+    std::unique_ptr<Expr> expr = logical_or();
 
     if (match({TokenType::EQUAL})) {
         Token equals = previous();
@@ -113,6 +118,29 @@ std::unique_ptr<Expr> Parser::assignment() {
     return expr;
 }
 
+std::unique_ptr<Expr> Parser::logical_or() {
+    std::unique_ptr<Expr> expr = logical_and();
+
+    while (match({TokenType::OR})) {
+        Token op = previous();
+        std::unique_ptr<Expr> right = logical_and();
+        expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
+    }
+
+    return expr;
+}
+
+std::unique_ptr<Expr> Parser::logical_and() {
+    std::unique_ptr<Expr> expr = equality();
+
+    while (match({TokenType::AND})) {
+        Token op = previous();
+        std::unique_ptr<Expr> right = equality();
+        expr = std::make_unique<Logical>(std::move(expr), op, std::move(right));
+    }
+
+    return expr;
+}
 
 std::unique_ptr<Expr> Parser::equality() {
     std::unique_ptr<Expr> expr = comparison();
