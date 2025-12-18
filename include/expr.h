@@ -3,7 +3,8 @@
 
 #include <any>
 #include <memory>
-#include <vector>#include "token.h"
+#include <vector>
+#include "token.h"
 
 class Assign;
 class Binary;

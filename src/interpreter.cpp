@@ -98,6 +98,13 @@ std::any Interpreter::visitVarStmt(Var* stmt) {
     return std::any{};
 }
 
+std::any Interpreter::visitWhileStmt(While* stmt) {
+    while (isTruthy(evaluate(stmt->condition.get()))) {
+        execute(stmt->body.get());
+    }
+    return std::any{};
+}
+
 std::any Interpreter::visitAssignExpr(Assign* expr) {
     std::any value = evaluate(expr->value.get());
     environment->assign(expr->name, value);

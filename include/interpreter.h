@@ -22,6 +22,7 @@ public:
     std::any visitIfStmt(If* stmt) override;
     std::any visitPrintStmt(Print* stmt) override;
     std::any visitVarStmt(Var* stmt) override;
+    std::any visitWhileStmt(While* stmt) override;
     std::any visitAssignExpr(Assign* expr) override;
     std::any visitBlockStmt(Block* stmt) override;
     void checkNumberOperand(const Token& op, const std::any& operand);

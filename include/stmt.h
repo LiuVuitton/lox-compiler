@@ -3,14 +3,14 @@
 
 #include <any>
 #include <memory>
-#include <vector>#include "token.h"
+#include <vector>
+#include "token.h"
 #include "expr.h"
 
 class Block;
 class Expression;
 class If;
 class Print;
-class Var;
 class While;
 class Var;
 
@@ -23,7 +23,6 @@ public:
         virtual std::any visitExpressionStmt(Expression* stmt) = 0;
         virtual std::any visitIfStmt(If* stmt) = 0;
         virtual std::any visitPrintStmt(Print* stmt) = 0;
-        virtual std::any visitVarStmt(Var* stmt) = 0;
         virtual std::any visitWhileStmt(While* stmt) = 0;
         virtual std::any visitVarStmt(Var* stmt) = 0;
     };
@@ -63,15 +62,6 @@ public:
     std::unique_ptr<Expr> expr;
 
     explicit Print(std::unique_ptr<Expr> expr);
-    std::any accept(Visitor& visitor) override;
-};
-
-class Var : public Stmt {
-public:
-    Token name;
-    std::unique_ptr<Expr> initializer;
-
-    explicit Var(Token name, std::unique_ptr<Expr> initializer);
     std::any accept(Visitor& visitor) override;
 };
 

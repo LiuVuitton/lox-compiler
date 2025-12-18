@@ -40,11 +40,63 @@ std::unique_ptr<Stmt> Parser::declaration() {
 }
 
 std::unique_ptr<Stmt> Parser::statement() {
+    if (match({TokenType::FOR})) return forStatement();
     if (match({TokenType::IF})) return ifStatement();
     if (match({TokenType::PRINT})) return printStatement();
     if (match({TokenType::WHILE})) return whileStatement();
     if (match({TokenType::LEFT_BRACE})) return std::make_unique<Block>(block());
     return expressionStatement();
+}
+
+std::unique_ptr<Stmt> Parser::forStatement() {
+    consume(TokenType::LEFT_PAREN, "Expect '(' after 'for'.");
+
+    std::unique_ptr<Stmt> initializer;
+    if (match({TokenType::SEMICOLON})) {
+        initializer = nullptr;
+    }
+    else if (match({TokenType::VAR})) {
+        initializer = varDeclaration();
+    }
+    else {
+        initializer = expressionStatement();
+    }
+
+    std::unique_ptr<Expr> condition;
+    if (!check(TokenType::SEMICOLON)) {
+        condition = expression();
+    }
+    consume (TokenType::SEMICOLON, "Expect ';' after loop condition.");
+
+    std::unique_ptr<Expr> increment;
+    if (!check(TokenType::RIGHT_PAREN)) {
+        increment = expression();
+    }
+    consume(TokenType::RIGHT_PAREN, "Expect ')' after for clauses.");
+
+    std::unique_ptr<Stmt> body = statement();
+
+    if (increment) {
+        std::vector<std::unique_ptr<Stmt>> statements;
+        statements.push_back(std::move(body));
+        statements.push_back(std::make_unique<Expression>(std::move(increment)));
+        body = std::make_unique<Block>(std::move(statements));
+    }
+
+    if (!condition) {
+        condition = std::make_unique<Literal>(true);
+    }
+
+    body = std::make_unique<While>(std::move(condition), std::move(body));
+
+    if (initializer) {
+        std::vector<std::unique_ptr<Stmt>> statements;
+        statements.push_back(std::move(initializer));
+        statements.push_back(std::move(body));
+        body = std::make_unique<Block>(std::move(statements));
+    }
+
+    return body;
 }
 
 std::unique_ptr<Stmt> Parser::ifStatement() {
