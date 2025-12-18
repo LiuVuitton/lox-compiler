@@ -23,6 +23,7 @@ public:
     std::any visitFunctionStmt(Function* stmt) override;
     std::any visitIfStmt(If* stmt) override;
     std::any visitPrintStmt(Print* stmt) override;
+    std::any visitReturnStmt(Return* stmt) override;
     std::any visitVarStmt(Var* stmt) override;
     std::any visitWhileStmt(While* stmt) override;
     std::any visitAssignExpr(Assign* expr) override;

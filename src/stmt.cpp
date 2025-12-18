@@ -35,6 +35,13 @@ std::any Print::accept(Visitor& visitor) {
     return visitor.visitPrintStmt(this);
 }
 
+Return::Return(Token keyword, std::unique_ptr<Expr> value)
+    : keyword(keyword), value(std::move(value)) {}
+
+std::any Return::accept(Visitor& visitor) {
+    return visitor.visitReturnStmt(this);
+}
+
 While::While(std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body)
     : condition(std::move(condition)), body(std::move(body)) {}
 

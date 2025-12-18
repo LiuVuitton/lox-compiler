@@ -3,6 +3,7 @@
 #include "lox.h"
 #include "lox_callable.h"
 #include "lox_function.h"
+#include "function_return.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
@@ -100,6 +101,16 @@ std::any Interpreter::visitIfStmt(If* stmt) {
 std::any Interpreter::visitPrintStmt(Print* stmt) {
     std::any value = evaluate(stmt->expr.get());
     std::cout << stringify(value) << "\n";
+    return std::any{};
+}
+
+std::any Interpreter::visitReturnStmt(Return* stmt) {
+    std::any value;
+    if (stmt->value) {
+        value = evaluate(stmt->value.get());
+    }
+    throw FunctionReturn(value);
+
     return std::any{};
 }
 

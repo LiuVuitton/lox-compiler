@@ -174,6 +174,7 @@ int main(int argc, char* argv[]) {
                      "std::unique_ptr<Stmt> then_branch, "
                      "std::unique_ptr<Stmt> else_branch",
         "Print      : std::unique_ptr<Expr> expr",
+        "Return     : Token keyword, std::unique_ptr<Expr> value",
         "While      : std::unique_ptr<Expr> condition, std::unique_ptr<Stmt> body",
         "Var        : Token name, std::unique_ptr<Expr> initializer"
     });

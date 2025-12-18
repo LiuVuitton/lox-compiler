@@ -1,4 +1,5 @@
 #include "lox_function.h"
+#include "function_return.h"
 
 LoxFunction::LoxFunction(std::shared_ptr<Function> declaration)
     : declaration(std::move(declaration)) {}
@@ -15,8 +16,13 @@ std::any LoxFunction::call(Interpreter& interpreter,
         environment->define(declaration->params[i].lexeme, arguments[i]);
     }
 
-    interpreter.executeBlock(declaration->body, environment);
-
+    try {
+        interpreter.executeBlock(declaration->body, environment);
+    }
+    catch (FunctionReturn returnValue) {
+        return returnValue.value;
+    }
+        
     return std::any{};
 }
 
