@@ -336,9 +336,9 @@ std::unique_ptr<Expr> Parser::primary() {
         return std::make_unique<Literal>(previous().literal);
     }
     if (match({TokenType::IDENTIFIER})) {
-        return std::make_unique<Literal>(previous().lexeme);
+        return std::make_unique<Variable>(previous());
     }
-    if (match({TokenType::IDENTIFIER})) {
+    if (match({TokenType::VAR})) {
         return std::make_unique<Variable>(previous());
     }
     if (match({TokenType::LEFT_PAREN})) {

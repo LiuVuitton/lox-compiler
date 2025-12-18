@@ -4,25 +4,28 @@
 #include "lox_callable.h"
 #include "lox_function.h"
 #include "function_return.h"
+#include "native_function.h"
 #include <sstream>
 #include <iostream>
 #include <vector>
 #include <chrono>
 
 Interpreter::Interpreter()
-    : globals(std::make_shared<Environment>()), 
-      environment(globals) {
-        globals->define("clock", std::make_any<std::shared_ptr<LoxCallable>>(
-            std::make_shared<NativeFunction>(
-                [](Interpreter&, const std::vector<std::any>& args) -> std::any {
-                    auto now = std::chrono::system_clock::now();
-                    auto epoch = now.time_since_epoch();
-                    return std::chrono::duration<double>(epoch).count();
-                },
-                0
-            )
-        ));
-    }
+    : globals(std::make_shared<Environment>()),
+      environment(globals) 
+{
+    globals->define("clock", std::make_any<std::shared_ptr<LoxCallable>>(
+        std::make_shared<NativeFunction>(
+            [](Interpreter&, const std::vector<std::any>&) -> std::any {
+                auto now = std::chrono::system_clock::now();
+                auto epoch = now.time_since_epoch();
+                return std::chrono::duration<double>(epoch).count();
+            },
+            0
+        )
+    ));
+}
+
 
 void Interpreter::interpret(const std::vector<std::unique_ptr<Stmt>>& statements) {
     try {
@@ -78,15 +81,13 @@ std::any Interpreter::visitExpressionStmt(Expression* stmt) {
 }
 
 std::any Interpreter::visitFunctionStmt(Function* stmt) {
-    auto function = std::make_shared<LoxFunction>(
-        std::shared_ptr<Function>(stmt),
-        environment
-    );
-    environment->define(stmt->name.lexeme, std::make_any<std::shared_ptr<LoxCallable>>(function));
-
+    auto function = std::make_shared<LoxFunction>(stmt, environment);
+    
+    std::shared_ptr<LoxCallable> callable = function;
+    environment->define(stmt->name.lexeme, callable);
+    
     return std::any{};
 }
-
 
 std::any Interpreter::visitIfStmt(If* stmt) {
     if (isTruthy(evaluate(stmt->condition.get()))) {
@@ -196,36 +197,32 @@ std::any Interpreter::visitBinaryExpr(Binary* expr) {
 }
 
 std::any Interpreter::visitCallExpr(Call* expr) {
-    std::any callee = evaluate(expr->callee.get());
+    std::any calleeAny = evaluate(expr->callee.get());
 
-    std::vector<std::any> arguments;
-    for (std::unique_ptr<Expr>& argument : expr->arguments) {
-        arguments.push_back(evaluate(argument.get()));
-    }
 
-    std::any callee = evaluate(expr->callee.get());
-
-    LoxCallable* function;
+    std::shared_ptr<LoxCallable> function;
     try {
-        function = std::any_cast<LoxCallable*>(callee);
+        function = std::any_cast<std::shared_ptr<LoxCallable>>(calleeAny);
     } catch (const std::bad_any_cast&) {
         throw RuntimeError(expr->paren, "Can only call functions and classes.");
     }
 
-    if (!function) {
-        throw RuntimeError(expr->paren, "Can only call functions and classes.");
+    std::vector<std::any> arguments;
+    for (const auto& arg : expr->arguments) {
+        arguments.push_back(evaluate(arg.get()));
     }
 
     if (arguments.size() != function->arity()) {
         throw RuntimeError(
             expr->paren,
             "Expected " + std::to_string(function->arity()) +
-            " arguments but got " + std::to_string(arguments.size()) + "."
+            " arguments but got " + std::to_string(arguments.size())
         );
     }
 
     return function->call(*this, arguments);
 }
+
 
 void Interpreter::checkNumberOperands(const Token& op, const std::any& left, const std::any& right) {
     if (left.type() == typeid(double) && right.type() == typeid(double)) return;

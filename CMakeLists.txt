@@ -19,7 +19,10 @@ add_executable(lox
     src/interpreter.cpp
     src/stmt.cpp
     src/environment.cpp
-    
+    src/lox_callable.cpp
+    src/native_function.cpp
+    src/lox_function.cpp
+    src/function_return.cpp
 )
 
 target_include_directories(lox PRIVATE include)
