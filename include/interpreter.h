@@ -3,15 +3,20 @@
 
 #include "expr.h"
 #include "stmt.h"
-#include <any>
-#include <vector>
 #include "environment.h"
+
+#include <any>
+#include <memory>
+#include <vector>
+#include <string>
 
 class Interpreter : public Expr::Visitor, public Stmt::Visitor {
 public:
-    std::shared_ptr<Environment> globals;
     Interpreter();
-    void interpret(std::vector<std::unique_ptr<Stmt>> statements);
+
+    void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
+
+    // Expr visitors
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
@@ -19,6 +24,9 @@ public:
     std::any visitVariableExpr(Variable* expr) override;
     std::any visitBinaryExpr(Binary* expr) override;
     std::any visitCallExpr(Call* expr) override;
+    std::any visitAssignExpr(Assign* expr) override;
+
+    // Stmt visitors
     std::any visitExpressionStmt(Expression* stmt) override;
     std::any visitFunctionStmt(Function* stmt) override;
     std::any visitIfStmt(If* stmt) override;
@@ -26,10 +34,12 @@ public:
     std::any visitReturnStmt(Return* stmt) override;
     std::any visitVarStmt(Var* stmt) override;
     std::any visitWhileStmt(While* stmt) override;
-    std::any visitAssignExpr(Assign* expr) override;
     std::any visitBlockStmt(Block* stmt) override;
-    void checkNumberOperand(const Token& op, const std::any& operand);
-    void checkNumberOperands(const Token& op, const std::any& left, const std::any& right);
+
+    // Globals
+    std::shared_ptr<Environment> globals;
+
+    // Block execution helper
     void executeBlock(
         const std::vector<std::unique_ptr<Stmt>>& statements,
         std::shared_ptr<Environment> environment
@@ -37,12 +47,19 @@ public:
 
 private:
     std::shared_ptr<Environment> environment;
-    std::vector<std::vector<std::unique_ptr<Stmt>>> storedAst;
+
+    // Helpers
     std::any evaluate(Expr* expr);
-    bool isTruthy(const std::any& object);
+    void execute(Stmt* stmt);
+
+    bool isTruthy(const std::any& value);
     bool isEqual(const std::any& a, const std::any& b);
     std::string stringify(const std::any& object);
-    void execute(Stmt* stmt);
+
+    void checkNumberOperand(const Token& op, const std::any& operand);
+    void checkNumberOperands(const Token& op,
+                             const std::any& left,
+                             const std::any& right);
 };
 
 #endif // INTERPRETER_H
