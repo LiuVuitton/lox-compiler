@@ -23,6 +23,7 @@ add_executable(lox
     src/native_function.cpp
     src/lox_function.cpp
     src/function_return.cpp
+    src/resolver.cpp
 )
 
 target_include_directories(lox PRIVATE include)

@@ -15,6 +15,7 @@ public:
     Interpreter();
 
     void interpret(const std::vector<std::unique_ptr<Stmt>>& statements);
+    void resolve(Expr* expr, int depth);
 
     // Expr visitors
     std::any visitLiteralExpr(Literal* expr) override;
@@ -36,6 +37,8 @@ public:
     std::any visitWhileStmt(While* stmt) override;
     std::any visitBlockStmt(Block* stmt) override;
 
+    std::any lookUpVariable(const Token& name, Expr* expr);
+
     // Globals
     std::shared_ptr<Environment> globals;
 
@@ -47,6 +50,7 @@ public:
 
 private:
     std::shared_ptr<Environment> environment;
+    std::unordered_map<Expr*, int> locals;
 
     // Helpers
     std::any evaluate(Expr* expr);

@@ -15,6 +15,9 @@ public:
     Environment(std::shared_ptr<Environment> enclosing);
     std::any get(const Token& name);
     void define(const std::string& name, std::any value);
+    Environment* ancestor(int distance);
+    std::any getAt(int distance, const std::string& name);
+    void assignAt(int distance, const Token& name, std::any value);
     void assign(const Token& name, std::any value);
 
 private:

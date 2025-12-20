@@ -141,14 +141,23 @@ std::any Interpreter::visitBinaryExpr(Binary* expr) {
 }
 
 std::any Interpreter::visitVariableExpr(Variable* expr) {
-    return environment->get(expr->name);
+    return lookUpVariable(expr->name, expr);
 }
 
 std::any Interpreter::visitAssignExpr(Assign* expr) {
     std::any value = evaluate(expr->value.get());
-    environment->assign(expr->name, value);
+
+    auto it = locals.find(expr);
+    if (it != locals.end()) {
+        int distance = it->second;
+        environment->assignAt(distance, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
+
     return value;
 }
+
 
 std::any Interpreter::visitCallExpr(Call* expr) {
     std::any calleeAny = evaluate(expr->callee.get());
@@ -185,6 +194,10 @@ std::any Interpreter::visitCallExpr(Call* expr) {
 
 void Interpreter::execute(Stmt* stmt) {
     stmt->accept(*this);
+}
+
+void Interpreter::resolve(Expr* expr, int depth) {
+    locals[expr] = depth;
 }
 
 std::any Interpreter::visitExpressionStmt(Expression* stmt) {
@@ -250,6 +263,17 @@ std::any Interpreter::visitReturnStmt(Return* stmt) {
     }
     throw FunctionReturn(value);
 }
+
+std::any Interpreter::lookUpVariable(const Token& name, Expr* expr) {
+    auto it = locals.find(expr);
+    if (it != locals.end()) {
+        int distance = it->second;
+        return environment->getAt(distance, name.lexeme);
+    } else {
+        return globals->get(name);
+    }
+}
+
 
 /* =======================
    Utilities

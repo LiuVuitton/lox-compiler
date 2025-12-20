@@ -18,9 +18,25 @@ std::any Environment::get(const Token& name) {
     );
 }
 
-
 void Environment::define(const std::string& name, std::any value) {
     values[name] = value;
+}
+
+Environment* Environment::ancestor(int distance) {
+    Environment* environment = this;
+    for (int i = 0; i < distance; ++i) {
+        environment = environment->enclosing.get();
+    }
+
+    return environment;
+}
+
+std::any Environment::getAt(int distance, const std::string& name) {
+    return ancestor(distance)->values[name];
+}
+
+void Environment::assignAt(int distance, const Token& name, std::any value) {
+    ancestor(distance)->values[name.lexeme] = value;
 }
 
 void Environment::assign(const Token& name, std::any value) {

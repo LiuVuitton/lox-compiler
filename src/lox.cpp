@@ -6,6 +6,7 @@
 #include "parser.h"
 #include "ast_printer.h"
 #include "runtime_error.h"
+#include "resolver.h"
 
 #include <iostream>
 #include <fstream>
@@ -62,6 +63,12 @@ void run(const std::string& source) {
     }
 
     if (had_error) return;
+
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
+
+    if (had_error) return;
+    
     Lox::interpreter.interpret(std::move(statements));
 }
 
