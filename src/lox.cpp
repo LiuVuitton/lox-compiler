@@ -68,8 +68,8 @@ void run(const std::string& source) {
     resolver.resolve(statements);
 
     if (had_error) return;
-    
-    Lox::interpreter.interpret(std::move(statements));
+
+    Lox::interpreter.interpret(statements);
 }
 
 void error(int line, const std::string& message) {
