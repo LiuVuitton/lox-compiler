@@ -167,6 +167,7 @@ int main(int argc, char* argv[]) {
 
     defineAst(include_dir, src_dir, "Stmt", {
         "Block      : std::vector<std::unique_ptr<Stmt>> statements",
+        "Class      : Token name, std::vector<std::unique_ptr<Function>> methods",
         "Expression : std::unique_ptr<Expr> expr",
         "Function   : Token name, std::vector<Token> params, "
                      "std::vector<std::unique_ptr<Stmt>> body",

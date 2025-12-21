@@ -8,6 +8,7 @@
 #include "expr.h"
 
 class Block;
+class Class;
 class Expression;
 class Function;
 class If;
@@ -22,6 +23,7 @@ public:
     public:
         virtual ~Visitor() = default;
         virtual std::any visitBlockStmt(Block* stmt) = 0;
+        virtual std::any visitClassStmt(Class* stmt) = 0;
         virtual std::any visitExpressionStmt(Expression* stmt) = 0;
         virtual std::any visitFunctionStmt(Function* stmt) = 0;
         virtual std::any visitIfStmt(If* stmt) = 0;
@@ -40,6 +42,15 @@ public:
     std::vector<std::unique_ptr<Stmt>> statements;
 
     explicit Block(std::vector<std::unique_ptr<Stmt>> statements);
+    std::any accept(Visitor& visitor) override;
+};
+
+class Class : public Stmt {
+public:
+    Token name;
+    std::vector<std::unique_ptr<Function>> methods;
+
+    explicit Class(Token name, std::vector<std::unique_ptr<Function>> methods);
     std::any accept(Visitor& visitor) override;
 };
 

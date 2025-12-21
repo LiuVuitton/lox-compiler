@@ -7,6 +7,13 @@ std::any Block::accept(Visitor& visitor) {
     return visitor.visitBlockStmt(this);
 }
 
+Class::Class(Token name, std::vector<std::unique_ptr<Function>> methods)
+    : name(name), methods(std::move(methods)) {}
+
+std::any Class::accept(Visitor& visitor) {
+    return visitor.visitClassStmt(this);
+}
+
 Expression::Expression(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 
