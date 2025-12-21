@@ -27,6 +27,7 @@ public:
     std::any visitAssignExpr(Assign* expr) override;
     std::any visitBinaryExpr(Binary* expr) override;
     std::any visitCallExpr(Call* expr) override;
+    std::any visitGetExpr(Get* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;

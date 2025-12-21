@@ -324,6 +324,10 @@ std::unique_ptr<Expr> Parser::call() {
         if (match({TokenType::LEFT_PAREN})) {
             expr = finishCall(std::move(expr));
         }
+        else if (match({TokenType::DOT})) {
+            Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
+            expr = std::unique_ptr<Get>(std::move(expr), name);
+        }
         else {
             break;
         }

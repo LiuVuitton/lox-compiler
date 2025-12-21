@@ -147,6 +147,11 @@ std::any Resolver::visitCallExpr(Call* expr) {
     return {};
 }
 
+std::any Resolver::visitGetExpr(Get* expr) {
+    resolve(expr->object);
+    return {};
+}
+
 std::any Resolver::visitGroupingExpr(Grouping* expr) {
     resolve(expr->expr.get());
     return {};

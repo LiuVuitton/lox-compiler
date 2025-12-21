@@ -189,6 +189,18 @@ std::any Interpreter::visitCallExpr(Call* expr) {
     return function->call(*this, arguments);
 }
 
+std::any Interpreter::visitGetExpr(Expr::Get* expr) {
+    std::any object= evaluate(expr->object.get());
+
+    if (object.type() == typeid(std::shared_ptr<LoxInstance>)) {
+        auto instance = std::any_cast<std::shared_ptr<LoxInstance>>(object);
+        return instance->get(expr->name);
+    }
+
+    throw RuntimeError(expr->name, "Only instances have properties.");
+}
+
+
 /* =======================
    Statement execution
    ======================= */

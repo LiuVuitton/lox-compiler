@@ -26,6 +26,7 @@ public:
     std::any visitVariableExpr(Variable* expr) override;
     std::any visitBinaryExpr(Binary* expr) override;
     std::any visitCallExpr(Call* expr) override;
+    std::any visitGetExpr(Get* expr) override;
     std::any visitAssignExpr(Assign* expr) override;
 
     // Stmt visitors
