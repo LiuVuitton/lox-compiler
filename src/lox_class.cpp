@@ -1,6 +1,5 @@
 #include "lox_class.h"
 #include "lox_instance.h"
-#include <iostream>
 
 LoxClass::LoxClass(const std::string& name) 
     : name(std::move(name)) {}

@@ -21,6 +21,13 @@ std::any Call::accept(Visitor& visitor) {
     return visitor.visitCallExpr(this);
 }
 
+Get::Get(std::unique_ptr<Expr> object, Token name)
+    : object(std::move(object)), name(name) {}
+
+std::any Get::accept(Visitor& visitor) {
+    return visitor.visitGetExpr(this);
+}
+
 Grouping::Grouping(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 

@@ -9,6 +9,7 @@
 class Assign;
 class Binary;
 class Call;
+class Get;
 class Grouping;
 class Literal;
 class Logical;
@@ -23,6 +24,7 @@ public:
         virtual std::any visitAssignExpr(Assign* expr) = 0;
         virtual std::any visitBinaryExpr(Binary* expr) = 0;
         virtual std::any visitCallExpr(Call* expr) = 0;
+        virtual std::any visitGetExpr(Get* expr) = 0;
         virtual std::any visitGroupingExpr(Grouping* expr) = 0;
         virtual std::any visitLiteralExpr(Literal* expr) = 0;
         virtual std::any visitLogicalExpr(Logical* expr) = 0;
@@ -60,6 +62,15 @@ public:
     std::vector<std::unique_ptr<Expr>> arguments;
 
     explicit Call(std::unique_ptr<Expr> callee, Token paren, std::vector<std::unique_ptr<Expr>> arguments);
+    std::any accept(Visitor& visitor) override;
+};
+
+class Get : public Expr {
+public:
+    std::unique_ptr<Expr> object;
+    Token name;
+
+    explicit Get(std::unique_ptr<Expr> object, Token name);
     std::any accept(Visitor& visitor) override;
 };
 

@@ -158,6 +158,7 @@ int main(int argc, char* argv[]) {
         "Binary     : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
         "Call       : std::unique_ptr<Expr> callee, Token paren, "
                      "std::vector<std::unique_ptr<Expr>> arguments",
+        "Get        : std::unique_ptr<Expr> object, Token name",
         "Grouping   : std::unique_ptr<Expr> expr",
         "Literal    : std::any value",
         "Logical    : std::unique_ptr<Expr> left, Token op, std::unique_ptr<Expr> right",
