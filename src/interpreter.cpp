@@ -6,6 +6,7 @@
 #include "lox_function.h"
 #include "function_return.h"
 #include "native_function.h"
+#include "lox_instance.h"
 
 #include <iostream>
 #include <chrono>
@@ -228,6 +229,13 @@ std::any Interpreter::visitBlockStmt(Block* stmt) {
     return {};
 }
 
+std::any Interpreter::visitClassStmt(Class* stmt) {
+    environment->define(stmt->name.lexeme, {});
+    auto klass = std::make_shared<LoxClass>(stmt->name.lexeme);
+    environment->assign(stmt->name, std::make_any<std::shared_ptr<LoxCallable>>(klass));
+    return {};
+}
+
 std::any Interpreter::visitIfStmt(If* stmt) {
     if (isTruthy(evaluate(stmt->condition.get()))) {
         execute(stmt->then_branch.get());
@@ -366,5 +374,11 @@ std::string Interpreter::stringify(const std::any& object) {
     if (object.type() == typeid(bool))
         return std::any_cast<bool>(object) ? "true" : "false";
 
-    return "null";
+    if (object.type() == typeid(std::shared_ptr<LoxCallable>))
+        return std::any_cast<std::shared_ptr<LoxCallable>>(object)->toString();
+    
+    if (object.type() == typeid(std::shared_ptr<LoxInstance>))
+        return std::any_cast<std::shared_ptr<LoxInstance>>(object)->toString();
+
+    return "unknown";
 }

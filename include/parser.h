@@ -25,6 +25,7 @@ private:
 
     std::unique_ptr<Expr> expression();
     std::unique_ptr<Stmt> declaration();
+    std::unique_ptr<Stmt> classDeclaration();
     std::unique_ptr<Stmt> statement();
     std::unique_ptr<Stmt> forStatement();
     std::unique_ptr<Stmt> ifStatement();

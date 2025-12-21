@@ -73,6 +73,12 @@ std::any Resolver::visitBlockStmt(Block* stmt) {
     return {};
 }
 
+std::any Resolver::visitClassStmt(Class* stmt) {
+    declare(stmt->name);
+    define(stmt->name);
+    return {};
+}
+
 std::any Resolver::visitExpressionStmt(Expression* stmt) {
     resolve(stmt->expr.get());
     return {};

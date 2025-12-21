@@ -14,6 +14,7 @@ public:
 
     // Stmt visitors
     std::any visitBlockStmt(Block* stmt) override;
+    std::any visitClassStmt(Class* stmt) override;
     std::any visitExpressionStmt(Expression* stmt) override;
     std::any visitFunctionStmt(Function* stmt) override;
     std::any visitIfStmt(If* stmt) override;

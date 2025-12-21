@@ -4,6 +4,7 @@
 #include "expr.h"
 #include "stmt.h"
 #include "environment.h"
+#include "lox_class.h"
 
 #include <any>
 #include <memory>
@@ -36,6 +37,7 @@ public:
     std::any visitVarStmt(Var* stmt) override;
     std::any visitWhileStmt(While* stmt) override;
     std::any visitBlockStmt(Block* stmt) override;
+    std::any visitClassStmt(Class* stmt) override;
 
     std::any lookUpVariable(const Token& name, Expr* expr);
 
