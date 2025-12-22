@@ -84,6 +84,26 @@ std::any Interpreter::visitLogicalExpr(Logical* expr) {
     return evaluate(expr->right.get());
 }
 
+std::any Interpreter::visitSetExpr(Set* expr) {
+    std::any object = evaluate(expr->object.get());
+
+    if (object.type() != typeid(std::shared_ptr<LoxInstance>)) {
+        throw RuntimeError(
+            expr->name,
+            "Only instances have fields."
+        );
+    }
+
+    auto instance =
+        std::any_cast<std::shared_ptr<LoxInstance>>(object);
+
+    std::any value = evaluate(expr->value.get());
+    instance->set(expr->name, value);
+
+    return value;
+}
+
+
 std::any Interpreter::visitBinaryExpr(Binary* expr) {
     std::any left = evaluate(expr->left.get());
     std::any right = evaluate(expr->right.get());
@@ -189,7 +209,7 @@ std::any Interpreter::visitCallExpr(Call* expr) {
     return function->call(*this, arguments);
 }
 
-std::any Interpreter::visitGetExpr(Expr::Get* expr) {
+std::any Interpreter::visitGetExpr(Get* expr) {
     std::any object= evaluate(expr->object.get());
 
     if (object.type() == typeid(std::shared_ptr<LoxInstance>)) {
@@ -243,7 +263,15 @@ std::any Interpreter::visitBlockStmt(Block* stmt) {
 
 std::any Interpreter::visitClassStmt(Class* stmt) {
     environment->define(stmt->name.lexeme, {});
-    auto klass = std::make_shared<LoxClass>(stmt->name.lexeme);
+    
+    std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods;
+    for (const auto& method : stmt->methods) {
+        auto function =
+            std::make_shared<LoxFunction>(method.get(), environment);
+        methods[method->name.lexeme] = std::shared_ptr<LoxCallable>(function);
+    }
+
+    auto klass = std::make_shared<LoxClass>(stmt->name.lexeme, methods);
     environment->assign(stmt->name, std::make_any<std::shared_ptr<LoxCallable>>(klass));
     return {};
 }

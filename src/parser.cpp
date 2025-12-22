@@ -198,7 +198,6 @@ std::vector<std::unique_ptr<Stmt>> Parser::block() {
     return statements;
 }
 
-
 std::unique_ptr<Expr> Parser::assignment() {
     std::unique_ptr<Expr> expr = logical_or();
 
@@ -207,9 +206,19 @@ std::unique_ptr<Expr> Parser::assignment() {
         std::unique_ptr<Expr> value = assignment();
 
         if (auto* variable = dynamic_cast<Variable*>(expr.get())) {
-            Token name = variable->name;
-            return std::make_unique<Assign>(name, std::move(value));
+            return std::make_unique<Assign>(
+                variable->name,
+                std::move(value)
+            );
         }
+        else if (auto* get = dynamic_cast<Get*>(expr.get())) {
+            return std::make_unique<Set>(
+                std::move(get->object),
+                get->name,
+                std::move(value)
+            );
+        }
+
         error(equals, "Invalid assignment target.");
     }
 
@@ -326,7 +335,7 @@ std::unique_ptr<Expr> Parser::call() {
         }
         else if (match({TokenType::DOT})) {
             Token name = consume(TokenType::IDENTIFIER, "Expect property name after '.'.");
-            expr = std::unique_ptr<Get>(std::move(expr), name);
+            expr = std::make_unique<Get>(std::move(expr), name);
         }
         else {
             break;

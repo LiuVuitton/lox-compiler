@@ -28,6 +28,13 @@ std::any Get::accept(Visitor& visitor) {
     return visitor.visitGetExpr(this);
 }
 
+Set::Set(std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value)
+    : object(std::move(object)), name(name), value(std::move(value)) {}
+
+std::any Set::accept(Visitor& visitor) {
+    return visitor.visitSetExpr(this);
+}
+
 Grouping::Grouping(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 

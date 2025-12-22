@@ -21,6 +21,7 @@ public:
     // Expr visitors
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
+    std::any visitSetExpr(Set* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitVariableExpr(Variable* expr) override;

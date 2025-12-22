@@ -76,6 +76,10 @@ std::any Resolver::visitBlockStmt(Block* stmt) {
 std::any Resolver::visitClassStmt(Class* stmt) {
     declare(stmt->name);
     define(stmt->name);
+    for (auto& method : stmt->methods) {
+        FunctionType declaration = FunctionType::METHOD;
+        resolveFunction(method.get(), declaration);
+    }
     return {};
 }
 
@@ -148,7 +152,7 @@ std::any Resolver::visitCallExpr(Call* expr) {
 }
 
 std::any Resolver::visitGetExpr(Get* expr) {
-    resolve(expr->object);
+    resolve(expr->object.get());
     return {};
 }
 
@@ -164,6 +168,12 @@ std::any Resolver::visitLiteralExpr(Literal* /*expr*/) {
 std::any Resolver::visitLogicalExpr(Logical* expr) {
     resolve(expr->left.get());
     resolve(expr->right.get());
+    return {};
+}
+
+std::any Resolver::visitSetExpr(Set* expr) {
+    resolve(expr->value.get());
+    resolve(expr->object.get());
     return {};
 }
 

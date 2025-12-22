@@ -31,13 +31,15 @@ public:
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
+    std::any visitSetExpr(Set* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitVariableExpr(Variable* expr) override;
 
 private:
     enum class FunctionType {
         NONE,
-        FUNCTION
+        FUNCTION,
+        METHOD
     };
     Interpreter& interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;
