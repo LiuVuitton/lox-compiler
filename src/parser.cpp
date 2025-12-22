@@ -351,6 +351,7 @@ std::unique_ptr<Expr> Parser::primary() {
     if (match({TokenType::NUMBER, TokenType::STRING})) {
         return std::make_unique<Literal>(previous().literal);
     }
+    if (match({TokenType::THIS})) return std::make_unique<This>(previous());
     if (match({TokenType::IDENTIFIER})) {
         return std::make_unique<Variable>(previous());
     }

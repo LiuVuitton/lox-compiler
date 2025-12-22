@@ -74,12 +74,21 @@ std::any Resolver::visitBlockStmt(Block* stmt) {
 }
 
 std::any Resolver::visitClassStmt(Class* stmt) {
+    ClassType enclosing_class = current_class;
+    current_class = ClassType::CLASS;
     declare(stmt->name);
     define(stmt->name);
+    beginScope();
+    scopes.back()["this"] = true;
     for (auto& method : stmt->methods) {
         FunctionType declaration = FunctionType::METHOD;
+        if (method->name.lexeme == "init") {
+            declaration = FunctionType::INITIALIZER;
+        }
         resolveFunction(method.get(), declaration);
     }
+    endScope();
+    current_class = enclosing_class;
     return {};
 }
 
@@ -105,7 +114,13 @@ std::any Resolver::visitReturnStmt(Return* stmt) {
         Lox::error(stmt->keyword, "Can't return from top-level code.");
     }
     
-    if (stmt->value) resolve(stmt->value.get());
+    if (stmt->value) {
+        if (current_function == FunctionType::INITIALIZER) {
+            Lox::error(stmt->keyword, "Can't return a value from an initializer.");
+        }
+        
+        resolve(stmt->value.get());
+    }
     return {};
 }
 
@@ -174,6 +189,15 @@ std::any Resolver::visitLogicalExpr(Logical* expr) {
 std::any Resolver::visitSetExpr(Set* expr) {
     resolve(expr->value.get());
     resolve(expr->object.get());
+    return {};
+}
+
+std::any Resolver::visitThisExpr(This* expr) {
+    if (current_class == ClassType::NONE) {
+        Lox::error(expr->keyword, "Can't use 'this' outside of a class.");
+        return {};
+    }
+    resolveLocal(expr, expr->keyword);
     return {};
 }
 

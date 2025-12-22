@@ -35,6 +35,13 @@ std::any Set::accept(Visitor& visitor) {
     return visitor.visitSetExpr(this);
 }
 
+This::This(Token keyword)
+    : keyword(keyword) {}
+
+std::any This::accept(Visitor& visitor) {
+    return visitor.visitThisExpr(this);
+}
+
 Grouping::Grouping(std::unique_ptr<Expr> expr)
     : expr(std::move(expr)) {}
 

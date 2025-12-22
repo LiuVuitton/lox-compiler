@@ -11,6 +11,7 @@ class Binary;
 class Call;
 class Get;
 class Set;
+class This;
 class Grouping;
 class Literal;
 class Logical;
@@ -27,6 +28,7 @@ public:
         virtual std::any visitCallExpr(Call* expr) = 0;
         virtual std::any visitGetExpr(Get* expr) = 0;
         virtual std::any visitSetExpr(Set* expr) = 0;
+        virtual std::any visitThisExpr(This* expr) = 0;
         virtual std::any visitGroupingExpr(Grouping* expr) = 0;
         virtual std::any visitLiteralExpr(Literal* expr) = 0;
         virtual std::any visitLogicalExpr(Logical* expr) = 0;
@@ -83,6 +85,14 @@ public:
     std::unique_ptr<Expr> value;
 
     explicit Set(std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value);
+    std::any accept(Visitor& visitor) override;
+};
+
+class This : public Expr {
+public:
+    Token keyword;
+
+    explicit This(Token keyword);
     std::any accept(Visitor& visitor) override;
 };
 

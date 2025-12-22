@@ -9,11 +9,21 @@
 #include <vector>
 #include <string>
 
+class LoxInstance;
 
 class LoxFunction : public LoxCallable {
 public:
     LoxFunction(Function* declaration,
-                std::shared_ptr<Environment> closure);
+                std::shared_ptr<Environment> closure,
+                bool isInitializer);
+
+    LoxFunction(const std::string& name,
+                const std::vector<Token>& params,
+                std::shared_ptr<std::vector<std::unique_ptr<Stmt>>> body,
+                std::shared_ptr<Environment> closure,
+                bool isInitializer);
+
+    std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> instance);
 
     int arity() const override;
     std::any call(Interpreter& interpreter,
@@ -23,8 +33,9 @@ public:
 private:
     std::string name;
     std::vector<Token> params;
-    std::vector<std::unique_ptr<Stmt>> body;
+    std::shared_ptr<std::vector<std::unique_ptr<Stmt>>> body;
     std::shared_ptr<Environment> closure;
+    bool isInitializer;
 };
 
 #endif // LOX_FUNCTION_H

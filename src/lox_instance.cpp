@@ -16,10 +16,13 @@ std::any LoxInstance::get(const Token& name) {
 
     auto method = klass->findMethod(name.lexeme);
     if (method) {
-        return std::static_pointer_cast<LoxCallable>(method);
+        auto boundMethod = method->bind(shared_from_this());
+        return std::static_pointer_cast<LoxCallable>(boundMethod);
     }
+
     throw RuntimeError(name, "Undefined property '" + name.lexeme + "'.");
 }
+
 
 
 void LoxInstance::set(const Token& name, std::any value) {

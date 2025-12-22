@@ -103,6 +103,9 @@ std::any Interpreter::visitSetExpr(Set* expr) {
     return value;
 }
 
+std::any Interpreter::visitThisExpr(This* expr) {
+    return lookUpVariable(expr->keyword, expr);
+}
 
 std::any Interpreter::visitBinaryExpr(Binary* expr) {
     std::any left = evaluate(expr->left.get());
@@ -267,7 +270,7 @@ std::any Interpreter::visitClassStmt(Class* stmt) {
     std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods;
     for (const auto& method : stmt->methods) {
         auto function =
-            std::make_shared<LoxFunction>(method.get(), environment);
+            std::make_shared<LoxFunction>(method.get(), environment, method->name.lexeme == "init");
         methods[method->name.lexeme] = std::shared_ptr<LoxCallable>(function);
     }
 
@@ -294,7 +297,7 @@ std::any Interpreter::visitWhileStmt(While* stmt) {
 
 std::any Interpreter::visitFunctionStmt(Function* stmt) {
     auto function =
-        std::make_shared<LoxFunction>(stmt, environment);
+        std::make_shared<LoxFunction>(stmt, environment, false);
 
     environment->define(
         stmt->name.lexeme,

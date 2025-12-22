@@ -32,6 +32,7 @@ public:
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
     std::any visitSetExpr(Set* expr) override;
+    std::any visitThisExpr(This* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitVariableExpr(Variable* expr) override;
 
@@ -39,11 +40,18 @@ private:
     enum class FunctionType {
         NONE,
         FUNCTION,
+        INITIALIZER,
         METHOD
+    };
+
+    enum class ClassType {
+        NONE,
+        CLASS
     };
     Interpreter& interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;
     FunctionType current_function{FunctionType::NONE};
+    ClassType current_class{ClassType::NONE};
 
     void resolve(Stmt* stmt);
     void resolve(Expr* expr);

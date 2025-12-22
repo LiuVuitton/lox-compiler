@@ -17,7 +17,7 @@ public:
         const std::string& name,
         std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods
     );
-    std::shared_ptr<LoxFunction> findMethod(const std::string& name);
+    std::shared_ptr<LoxFunction> findMethod(const std::string& name) const;
 
     std::any call(Interpreter& interpreter, const std::vector<std::any>& arguments) override;
     int arity() const override;
