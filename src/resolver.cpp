@@ -78,6 +78,12 @@ std::any Resolver::visitClassStmt(Class* stmt) {
     current_class = ClassType::CLASS;
     declare(stmt->name);
     define(stmt->name);
+    if (stmt->superclass && stmt->name.lexeme == stmt->superclass->name.lexeme) {
+        Lox::error(stmt->superclass->name, "A class can't inherit from itself.");
+    }
+    if (stmt->superclass) {
+        resolve(stmt->superclass.get());
+    }
     beginScope();
     scopes.back()["this"] = true;
     for (auto& method : stmt->methods) {

@@ -1,0 +1,10 @@
+class Donut {
+    cook() {
+        print "cook";
+    }
+}
+
+Donut().cook();
+
+class Cream < Donut {}
+Cream().cook();

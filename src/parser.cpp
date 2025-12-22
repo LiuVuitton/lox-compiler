@@ -33,6 +33,11 @@ std::unique_ptr<Stmt> Parser::declaration() {
 
 std::unique_ptr<Stmt> Parser::classDeclaration() {
     Token name = consume(TokenType::IDENTIFIER, "Expect class name.");
+    std::shared_ptr<Variable> superclass;
+    if (match({TokenType::LESS})) {
+        consume(TokenType::IDENTIFIER, "Expect superclass name.");
+        superclass = std::make_shared<Variable>(previous());
+    }
     consume(TokenType::LEFT_BRACE, "Expect '{' before class body.");
 
     std::vector<std::unique_ptr<Function>> methods;
@@ -40,7 +45,7 @@ std::unique_ptr<Stmt> Parser::classDeclaration() {
         methods.push_back(function("method"));
     }
     consume(TokenType::RIGHT_BRACE, "Expect '}' after class body.");
-    return std::make_unique<Class>(name, std::move(methods));
+    return std::make_unique<Class>(name, superclass, std::move(methods));
 }
 
 std::unique_ptr<Stmt> Parser::statement() {

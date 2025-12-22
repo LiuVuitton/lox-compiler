@@ -7,8 +7,8 @@ std::any Block::accept(Visitor& visitor) {
     return visitor.visitBlockStmt(this);
 }
 
-Class::Class(Token name, std::vector<std::unique_ptr<Function>> methods)
-    : name(name), methods(std::move(methods)) {}
+Class::Class(Token name, std::shared_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods)
+    : name(name), superclass(superclass), methods(std::move(methods)) {}
 
 std::any Class::accept(Visitor& visitor) {
     return visitor.visitClassStmt(this);

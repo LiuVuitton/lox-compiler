@@ -15,6 +15,7 @@ class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClas
 public:
     explicit LoxClass(
         const std::string& name,
+        std::shared_ptr<LoxClass> superclass,
         std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods
     );
     std::shared_ptr<LoxFunction> findMethod(const std::string& name) const;
@@ -25,6 +26,7 @@ public:
 
 private:
     std::string name;
+    std::shared_ptr<LoxClass> superclass;
     std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods;
 };
 

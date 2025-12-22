@@ -265,6 +265,25 @@ std::any Interpreter::visitBlockStmt(Block* stmt) {
 }
 
 std::any Interpreter::visitClassStmt(Class* stmt) {
+    std::shared_ptr<LoxClass> superclass = nullptr;
+
+    if (stmt->superclass) {  // first, check if the AST node even has a superclass
+        std::any value = evaluate(stmt->superclass.get());
+        
+        if (value.has_value()) {
+            auto callable = std::any_cast<std::shared_ptr<LoxCallable>>(value);
+            superclass = std::dynamic_pointer_cast<LoxClass>(callable);
+            if (!superclass) {
+                throw RuntimeError(stmt->superclass->name,
+                    "Superclass must be a class.");
+            }
+        } else {
+            throw RuntimeError(stmt->superclass->name,
+                "Superclass not defined.");
+        }
+    }
+
+
     environment->define(stmt->name.lexeme, {});
     
     std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods;
@@ -274,7 +293,7 @@ std::any Interpreter::visitClassStmt(Class* stmt) {
         methods[method->name.lexeme] = std::shared_ptr<LoxCallable>(function);
     }
 
-    auto klass = std::make_shared<LoxClass>(stmt->name.lexeme, methods);
+    auto klass = std::make_shared<LoxClass>(stmt->name.lexeme, superclass, methods);
     environment->assign(stmt->name, std::make_any<std::shared_ptr<LoxCallable>>(klass));
     return {};
 }

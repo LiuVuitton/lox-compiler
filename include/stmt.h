@@ -48,9 +48,10 @@ public:
 class Class : public Stmt {
 public:
     Token name;
+    std::shared_ptr<Variable> superclass;
     std::vector<std::unique_ptr<Function>> methods;
 
-    explicit Class(Token name, std::vector<std::unique_ptr<Function>> methods);
+    explicit Class(Token name, std::shared_ptr<Variable> superclass, std::vector<std::unique_ptr<Function>> methods);
     std::any accept(Visitor& visitor) override;
 };
 

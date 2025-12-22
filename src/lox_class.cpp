@@ -4,14 +4,18 @@
 
 LoxClass::LoxClass(
     const std::string& name,
+    std::shared_ptr<LoxClass> superclass,
     std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods    
 ) 
-    : name(std::move(name)), methods(std::move(methods)) {}
+    : name(std::move(name)), superclass(superclass), methods(std::move(methods)) {}
 
 std::shared_ptr<LoxFunction> LoxClass::findMethod(const std::string& name) const {
     auto it = methods.find(name);
     if (it != methods.end()) {
         return std::dynamic_pointer_cast<LoxFunction>(it->second);
+    }
+    if (superclass) {
+        return superclass->findMethod(name);
     }
     return nullptr;
 }
