@@ -22,6 +22,7 @@ public:
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
     std::any visitSetExpr(Set* expr) override;
+    std::any visitSuperExpr(Super* expr) override;
     std::any visitThisExpr(This* expr) override;
     std::any visitGroupingExpr(Grouping* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;

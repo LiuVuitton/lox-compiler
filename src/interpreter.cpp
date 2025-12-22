@@ -103,6 +103,19 @@ std::any Interpreter::visitSetExpr(Set* expr) {
     return value;
 }
 
+std::any Interpreter::visitSuperExpr(Super* expr) {
+    int distance = locals.at(expr);
+
+    auto superclass = std::any_cast<std::shared_ptr<LoxClass>>(environment->getAt(distance, "super"));
+    auto object = std::any_cast<std::shared_ptr<LoxInstance>>(environment->getAt(distance - 1, "this"));
+    auto method = superclass->findMethod(expr->method.lexeme);
+    if (!method) {
+        throw new RuntimeError(expr->method, "Undefined property '" + expr->method.lexeme + "'.");
+    }
+    return method->bind(object);
+}
+
+
 std::any Interpreter::visitThisExpr(This* expr) {
     return lookUpVariable(expr->keyword, expr);
 }
@@ -267,7 +280,7 @@ std::any Interpreter::visitBlockStmt(Block* stmt) {
 std::any Interpreter::visitClassStmt(Class* stmt) {
     std::shared_ptr<LoxClass> superclass = nullptr;
 
-    if (stmt->superclass) {  // first, check if the AST node even has a superclass
+    if (stmt->superclass) {
         std::any value = evaluate(stmt->superclass.get());
         
         if (value.has_value()) {
@@ -285,6 +298,11 @@ std::any Interpreter::visitClassStmt(Class* stmt) {
 
 
     environment->define(stmt->name.lexeme, {});
+
+    if (stmt->superclass) {
+        environment = std::make_shared<Environment>(environment);
+        environment->define("super", superclass);
+    }
     
     std::unordered_map<std::string, std::shared_ptr<LoxCallable>> methods;
     for (const auto& method : stmt->methods) {
@@ -294,6 +312,11 @@ std::any Interpreter::visitClassStmt(Class* stmt) {
     }
 
     auto klass = std::make_shared<LoxClass>(stmt->name.lexeme, superclass, methods);
+
+    if (superclass) {
+        environment = environment->enclosing;
+    }
+
     environment->assign(stmt->name, std::make_any<std::shared_ptr<LoxCallable>>(klass));
     return {};
 }

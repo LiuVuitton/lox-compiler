@@ -160,6 +160,7 @@ int main(int argc, char* argv[]) {
                      "std::vector<std::unique_ptr<Expr>> arguments",
         "Get        : std::unique_ptr<Expr> object, Token name",
         "Set        : std::unique_ptr<Expr> object, Token name, std::unique_ptr<Expr> value",
+        "Super      : Token keyword, Token method",
         "This       : Token keyword",
         "Grouping   : std::unique_ptr<Expr> expr",
         "Literal    : std::any value",

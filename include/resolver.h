@@ -32,6 +32,7 @@ public:
     std::any visitLiteralExpr(Literal* expr) override;
     std::any visitLogicalExpr(Logical* expr) override;
     std::any visitSetExpr(Set* expr) override;
+    std::any visitSuperExpr(Super* expr) override;
     std::any visitThisExpr(This* expr) override;
     std::any visitUnaryExpr(Unary* expr) override;
     std::any visitVariableExpr(Variable* expr) override;
@@ -46,7 +47,8 @@ private:
 
     enum class ClassType {
         NONE,
-        CLASS
+        CLASS,
+        SUBCLASS
     };
     Interpreter& interpreter;
     std::vector<std::unordered_map<std::string, bool>> scopes;

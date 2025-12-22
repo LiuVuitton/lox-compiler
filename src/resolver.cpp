@@ -82,7 +82,12 @@ std::any Resolver::visitClassStmt(Class* stmt) {
         Lox::error(stmt->superclass->name, "A class can't inherit from itself.");
     }
     if (stmt->superclass) {
+        current_class = ClassType::SUBCLASS;
         resolve(stmt->superclass.get());
+    }
+    if (stmt->superclass) {
+        beginScope();
+        scopes.back()["super"] = true;
     }
     beginScope();
     scopes.back()["this"] = true;
@@ -94,6 +99,9 @@ std::any Resolver::visitClassStmt(Class* stmt) {
         resolveFunction(method.get(), declaration);
     }
     endScope();
+    if (stmt->superclass) {
+        endScope();
+    }
     current_class = enclosing_class;
     return {};
 }
@@ -195,6 +203,18 @@ std::any Resolver::visitLogicalExpr(Logical* expr) {
 std::any Resolver::visitSetExpr(Set* expr) {
     resolve(expr->value.get());
     resolve(expr->object.get());
+    return {};
+}
+
+std::any Resolver::visitSuperExpr(Super* expr) {
+    if (current_class == ClassType::NONE) {
+        Lox::error(expr->keyword, "Can't use 'super'outside of a class.");
+    }
+    else if (current_class != ClassType::SUBCLASS) {
+        Lox::error(expr->keyword, "Can't use 'super' in a class with no superclass.");
+    }
+    
+    resolveLocal(expr, expr->keyword);
     return {};
 }
 

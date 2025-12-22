@@ -35,6 +35,13 @@ std::any Set::accept(Visitor& visitor) {
     return visitor.visitSetExpr(this);
 }
 
+Super::Super(Token keyword, Token method)
+    : keyword(keyword), method(method) {}
+
+std::any Super::accept(Visitor& visitor) {
+    return visitor.visitSuperExpr(this);
+}
+
 This::This(Token keyword)
     : keyword(keyword) {}
 
