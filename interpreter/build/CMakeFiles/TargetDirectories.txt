@@ -1,0 +1,3 @@
+/home/lil9zrh/clox/interpreter/build/CMakeFiles/lox.dir
+/home/lil9zrh/clox/interpreter/build/CMakeFiles/edit_cache.dir
+/home/lil9zrh/clox/interpreter/build/CMakeFiles/rebuild_cache.dir
