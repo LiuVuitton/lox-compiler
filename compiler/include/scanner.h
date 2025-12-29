@@ -9,8 +9,8 @@ class Scanner {
     int current = 0;
     int line = 1;
 public:
+    Scanner() = default;
     explicit Scanner(std::string_view source);
-
     Token scanToken();
 
 private:
