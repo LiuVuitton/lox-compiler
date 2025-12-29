@@ -3,7 +3,7 @@
 #include <vector>
 #include "value_array.h"
 
-enum class OpCode {
+enum class OpCode : uint8_t {
     CONSTANT,
     ADD,
     SUBTRACT,

@@ -1,6 +1,7 @@
 #include "vm.h"
 #include "debug.h"
 #include <iostream>
+#include "compiler.h"
 
 
 InterpretResult VM::run() {
@@ -58,10 +59,9 @@ InterpretResult VM::run() {
 
 
 
-InterpretResult VM::interpret(Chunk* chunk) {
-    this->chunk = chunk;
-    ip = 0;
-    return run();
+InterpretResult VM::interpret(const std::string& source) {
+    compile(source);
+    return InterpretResult::OK;
 }
 
 

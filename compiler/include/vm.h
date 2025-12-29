@@ -23,7 +23,7 @@ class VM {
 public:
     VM() = default;
     InterpretResult run();
-    InterpretResult interpret(Chunk* chunk);
+    InterpretResult interpret(const std::string& source);
 
 private:
     uint8_t readByte();
