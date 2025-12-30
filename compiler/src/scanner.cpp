@@ -137,6 +137,7 @@ Token Scanner::string() {
 Token Scanner::scanToken() {
     if (isAtEnd()) return makeToken(TokenType::END_OF_FILE);
     skipWhitespace();
+    start = current;
 
     char c = advance();
 

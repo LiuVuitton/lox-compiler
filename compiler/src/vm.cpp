@@ -61,8 +61,9 @@ InterpretResult VM::run() {
 
 InterpretResult VM::interpret(const std::string& source) {
     Chunk chunk;
+    Compiler compiler = Compiler(source);
 
-    if (!compile(source, chunk)) {
+    if (!compiler.compile(chunk)) {
         return InterpretResult::COMPILE_ERROR;
     }
 

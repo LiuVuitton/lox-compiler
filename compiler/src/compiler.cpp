@@ -62,7 +62,7 @@ bool Compiler::compile(Chunk& chunk) {
     expression();
     parser.consume(TokenType::END_OF_FILE, "Expect end of expression.");
 
-    emitReturn();
+    endCompiler();
     return !parser.had_error;
 }
 
@@ -87,6 +87,15 @@ void Compiler::emitReturn() {
     emitByte(OpCode::RETURN);
 }
 
+void Compiler::endCompiler() {
+    emitReturn();
+    #ifdef DEBUG_PRINT_CODE
+    if (!parser.had_error) {
+        disassembleChunk(currentChunk(), "code");
+    }
+    #endif
+}
+
 void Compiler::number() {
     double value = std::stod(std::string(parser.previous.lexeme));
     emitConstant(value);
@@ -104,11 +113,11 @@ void Compiler::unary() {
 }
 
 void Compiler::binary() {
-    TokenType opType = parser.previous.type;
-    ParseRule rule = getRule(opType);
+    TokenType op_type = parser.previous.type;
+    ParseRule rule = getRule(op_type);
     parsePrecedence(static_cast<Precedence>(static_cast<int>(rule.precedence) + 1));
 
-    switch (opType) {
+    switch (op_type) {
         case TokenType::PLUS: emitByte(OpCode::ADD); break;
         case TokenType::MINUS: emitByte(OpCode::SUBTRACT); break;
         case TokenType::STAR: emitByte(OpCode::MULTIPLY); break;
@@ -128,7 +137,8 @@ void Compiler::expression() {
 
 void Compiler::parsePrecedence(Precedence precedence) {
     parser.advance();
-    ParseFn prefix = getRule(parser.previous.type).prefix;
+    ParseRule rule = getRule(parser.previous.type);
+    ParseFn prefix = rule.prefix;
     if (!prefix) {
         errorAt(parser.previous, "Expect expression.");
         return;

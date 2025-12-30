@@ -4,7 +4,7 @@
 Parser::Parser(Scanner& scanner_)
     : scanner(scanner_) 
 {
-    advance();
+    // advance();
 }
 
 void Parser::advance() {

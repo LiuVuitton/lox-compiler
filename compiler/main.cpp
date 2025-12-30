@@ -1,5 +1,6 @@
 #include "chunk.h"
 #include "debug.h"
+#include "lox.h"
 #include "vm.h"
 #include <iostream>
 
@@ -7,10 +8,10 @@ int main(int argc, const char* argv[]) {
     VM vm{};
     
     if (argc == 1) {
-        repl();
+        Lox::repl(vm);
     }
     else if (argc == 2) {
-        runFile(argv[1]);
+        Lox::runFile(vm, argv[1]);
     }
     else {
         std::cerr << "Usage: clox [path]\n";
