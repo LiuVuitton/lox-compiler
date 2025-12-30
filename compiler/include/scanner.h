@@ -1,33 +1,33 @@
 #pragma once
-
 #include <string_view>
 #include "token.h"
 
 class Scanner {
-    std::string_view source;
+    std::string source;
     int start = 0;
     int current = 0;
     int line = 1;
+
 public:
-    Scanner() = default;
-    explicit Scanner(std::string_view source);
+    explicit Scanner(const std::string& source);
+
     Token scanToken();
 
 private:
-    bool isAlpha(char c);
-    bool isDigit(char c);
+    bool isAlpha(char c) const;
+    bool isDigit(char c) const;
     bool isAtEnd() const;
     Token makeToken(TokenType type) const;
-    Token errorToken(std::string_view msg) const;
+    Token errorToken(const std::string& msg) const;
     void skipWhitespace();
-    TokenType checkKeyword(std::string_view lexeme, std::size_t start,
-                           std::string_view rest, TokenType type);
-    TokenType identifierType();
+    TokenType checkKeyword(const std::string& lexeme, std::size_t start,
+                           const std::string& rest, TokenType type) const;
+    TokenType identifierType() const;
     Token identifier();
     Token number();
     Token string();
     char advance();
-    char peek();
-    char peekNext();
+    char peek() const;
+    char peekNext() const;
     bool match(char expected);
 };

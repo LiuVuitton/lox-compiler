@@ -1,11 +1,11 @@
 #include "scanner.h"
 
-Scanner::Scanner(std::string_view src)
+Scanner::Scanner(const std::string& src)
     : start(0), current(0), line(1) {
     this->source = src;
 }
 
-bool Scanner::isAlpha(char c) {
+bool Scanner::isAlpha(char c) const {
     return (
         ('a' <= c && c <= 'z') ||
         ('A' <= c && c <= 'Z') ||
@@ -13,7 +13,7 @@ bool Scanner::isAlpha(char c) {
     );
 }
 
-bool Scanner::isDigit(char c) {
+bool Scanner::isDigit(char c) const {
     return '0' <= c && c <= '9';
 }
 
@@ -25,7 +25,7 @@ Token Scanner::makeToken(TokenType type) const {
     return { type, source.substr(start, current - start), line };
 }
 
-Token Scanner::errorToken(std::string_view msg) const {
+Token Scanner::errorToken(const std::string& msg) const {
     return { TokenType::ERROR, msg, line };
 }
 
@@ -56,10 +56,8 @@ void Scanner::skipWhitespace() {
     }
 }
 
-TokenType Scanner::checkKeyword(std::string_view lexeme,
-                       std::size_t start,
-                       std::string_view rest,
-                       TokenType type) {
+TokenType Scanner::checkKeyword(const std::string& lexeme, std::size_t start,
+                           const std::string& rest, TokenType type) const {
     if (lexeme.size() == start + rest.size() &&
         lexeme.substr(start, rest.size()) == rest) {
         return type;
@@ -68,8 +66,8 @@ TokenType Scanner::checkKeyword(std::string_view lexeme,
 }
 
 
-TokenType Scanner::identifierType() {
-    std::string_view lexeme = source.substr(start, current - start);
+TokenType Scanner::identifierType() const {
+    std::string lexeme = source.substr(start, current - start);
 
     switch (lexeme[0]) {
         case 'a': return checkKeyword(lexeme, 1, "nd", TokenType::AND);
@@ -175,11 +173,11 @@ char Scanner::advance() {
     return source[current++];
 }
 
-char Scanner::peek() {
+char Scanner::peek() const {
     return source[current];
 }
 
-char Scanner::peekNext() {
+char Scanner::peekNext() const {
     if (isAtEnd()) return '\0';
     return source[current + 1];
 }
