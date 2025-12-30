@@ -1,10 +1,10 @@
 #pragma once
 
 #include "token_type.h"
-#include <string_view>
+#include <string>
 
 struct Token {
     TokenType type;
-    std::string_view lexeme;
+    std::string lexeme;
     int line;
 };

@@ -18,13 +18,24 @@ private:
     Chunk* currentChunk();
     void advance();
     void consume(TokenType type, std::string_view msg);
-    void emitByte(OpCode bytecode);
-    void emitBytes(OpCode bytecode1, OpCode bytecode2);
+    void emitByte(uint8_t byte);
+
+    template <typename T>
+    void emitByte(T byte) {
+        emitByte(static_cast<uint8_t>(byte));
+    }
+
+    template <typename T1, typename T2>
+    void emitBytes(T1 byte1, T2 byte2) {
+        emitByte(byte1); 
+        emitByte(byte2);
+    }
+
     void emitReturn();
-    uint8_t makeConstant(); // TOOD
-    void emitConstant(); // TODO
+    uint8_t makeConstant(const Value& value);
+    void emitConstant(const Value& value);
     void endCompiler();
-    void number(); // TODO
+    void number();
 
     void expression();
     void errorAt(const Token& token, std::string_view msg);

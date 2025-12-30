@@ -38,21 +38,35 @@ void Compiler::consume(TokenType type, std::string_view msg) {
     errorAtCurrent(msg);
 }
 
-void Compiler::emitByte(OpCode bytecode) {
-    currentChunk()->write(static_cast<uint8_t>(bytecode), parser.previous.line);
-}
-    
-void Compiler::emitBytes(OpCode bytecode1, OpCode bytecode2) {
-    emitByte(bytecode1);
-    emitByte(bytecode2);
+void Compiler::emitByte(uint8_t byte) {
+    currentChunk()->write(byte, parser.previous.line);
 }
 
 void Compiler::emitReturn() {
     emitByte(OpCode::RETURN);
 }
 
+uint8_t Compiler::makeConstant(const Value& value) {
+    int constant = currentChunk()->addConstant(value);
+    if (constant > UINT8_MAX) {
+        error("Too many constants in one chunk.");
+        return 0;
+    }
+
+    return static_cast<uint8_t>(constant);
+}
+
+void Compiler::emitConstant(const Value& value) {
+    emitBytes(OpCode::CONSTANT, makeConstant(value));
+}
+
 void Compiler::endCompiler() {
     emitReturn();
+}
+
+void Compiler::number() {
+    double value = std::stod(parser.previous.lexeme);
+    emitConstant(value);
 }
 
 void Compiler::expression() {
