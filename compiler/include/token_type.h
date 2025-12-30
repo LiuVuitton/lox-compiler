@@ -48,7 +48,8 @@
     X(WHILE) \
     /* Special */ \
     X(ERROR) \
-    X(END_OF_FILE)
+    X(END_OF_FILE) \
+    X(COUNT)
 
 enum class TokenType : uint8_t {
 #define X(name) name,

@@ -1,103 +1,161 @@
 #include "compiler.h"
-
-
 #include <iostream>
-#include <format>
-#include "scanner.h"
-#include "token.h"
+#include <cstdlib>
+ 
+const std::unordered_map<TokenType, ParseRule> Compiler::rules = {
+    { TokenType::LEFT_PAREN,    { &Compiler::grouping, nullptr, Precedence::NONE } },
+    { TokenType::RIGHT_PAREN,   { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::LEFT_BRACE,    { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::RIGHT_BRACE,   { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::COMMA,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::DOT,           { nullptr, nullptr, Precedence::NONE } },
 
-bool Compiler::compile(const std::string& source, const Chunk* chunk) {
-    Scanner scanner(source);
-    advance();
+    { TokenType::MINUS,         { &Compiler::unary, &Compiler::binary, Precedence::TERM } },
+    { TokenType::PLUS,          { nullptr, &Compiler::binary, Precedence::TERM } },
+    { TokenType::SEMICOLON,     { nullptr, nullptr, Precedence::NONE } },
+
+    { TokenType::SLASH,         { nullptr, &Compiler::binary, Precedence::FACTOR } },
+    { TokenType::STAR,          { nullptr, &Compiler::binary, Precedence::FACTOR } },
+
+    { TokenType::BANG,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::BANG_EQUAL,    { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::EQUAL,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::EQUAL_EQUAL,   { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::GREATER,       { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::GREATER_EQUAL, { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::LESS,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::LESS_EQUAL,    { nullptr, nullptr, Precedence::NONE } },
+
+    { TokenType::IDENTIFIER,    { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::STRING,        { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::NUMBER,        { &Compiler::number, nullptr, Precedence::NONE } },
+
+    { TokenType::AND,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::CLASS,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::ELSE,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::FALSE,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::FOR,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::FUN,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::IF,            { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::NIL,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::OR,            { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::PRINT,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::RETURN,        { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::SUPER,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::THIS,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::TRUE,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::VAR,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::WHILE,         { nullptr, nullptr, Precedence::NONE } },
+
+    { TokenType::ERROR,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::END_OF_FILE,   { nullptr, nullptr, Precedence::NONE } },
+};
+
+Compiler::Compiler(const std::string& source)
+    : scanner(source), parser(scanner), compiling_chunk(nullptr)
+        {}
+
+bool Compiler::compile(Chunk& chunk) {
+    compiling_chunk = &chunk;
+
+    parser.advance();
     expression();
-    consume(TokenType::END_OF_FILE, "Expected end of expression.");
-    endCompiler();
+    parser.consume(TokenType::END_OF_FILE, "Expect end of expression.");
+
+    emitReturn();
     return !parser.had_error;
 }
 
-Chunk* Compiler::currentChunk() {
-    return compiling_chunk;
-}
-
-void Compiler::advance() {
-    parser.previous = parser.current;
-
-    while (true) {
-        parser.current = scanner.scanToken();
-        if (parser.current.type != TokenType::ERROR) break;
-        errorAtCurrent(parser.current.lexeme);
-    }
-}
-
-void Compiler::consume(TokenType type, std::string_view msg) {
-    if (parser.current.type == type) {
-        advance();
-        return;
-    }
-
-    errorAtCurrent(msg);
-}
-
 void Compiler::emitByte(uint8_t byte) {
-    currentChunk()->write(byte, parser.previous.line);
-}
-
-void Compiler::emitReturn() {
-    emitByte(OpCode::RETURN);
+    compiling_chunk->write(byte, parser.previous.line);
 }
 
 uint8_t Compiler::makeConstant(const Value& value) {
-    int constant = currentChunk()->addConstant(value);
-    if (constant > UINT8_MAX) {
+    int index = compiling_chunk->addConstant(value);
+    if (index > UINT8_MAX) {
         error("Too many constants in one chunk.");
         return 0;
     }
-
-    return static_cast<uint8_t>(constant);
+    return static_cast<uint8_t>(index);
 }
 
 void Compiler::emitConstant(const Value& value) {
     emitBytes(OpCode::CONSTANT, makeConstant(value));
 }
 
-void Compiler::endCompiler() {
-    emitReturn();
+void Compiler::emitReturn() {
+    emitByte(OpCode::RETURN);
 }
 
 void Compiler::number() {
-    double value = std::stod(parser.previous.lexeme);
+    double value = std::stod(std::string(parser.previous.lexeme));
     emitConstant(value);
 }
 
+void Compiler::unary() {
+    TokenType opType = parser.previous.type;
+    // Compile the operand
+    parsePrecedence(Precedence::UNARY);
+
+    switch (opType) {
+        case TokenType::MINUS: emitByte(OpCode::NEGATE); break;
+        default: break;
+    }
+}
+
+void Compiler::binary() {
+    TokenType opType = parser.previous.type;
+    ParseRule rule = getRule(opType);
+    parsePrecedence(static_cast<Precedence>(static_cast<int>(rule.precedence) + 1));
+
+    switch (opType) {
+        case TokenType::PLUS: emitByte(OpCode::ADD); break;
+        case TokenType::MINUS: emitByte(OpCode::SUBTRACT); break;
+        case TokenType::STAR: emitByte(OpCode::MULTIPLY); break;
+        case TokenType::SLASH: emitByte(OpCode::DIVIDE); break;
+        default: break;
+    }
+}
+
+void Compiler::grouping() {
+    expression();
+    parser.consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
+}
+
 void Compiler::expression() {
-    
+    parsePrecedence(Precedence::ASSIGNMENT);
+}
+
+void Compiler::parsePrecedence(Precedence precedence) {
+    parser.advance();
+    ParseFn prefix = getRule(parser.previous.type).prefix;
+    if (!prefix) {
+        errorAt(parser.previous, "Expect expression.");
+        return;
+    }
+
+    (this->*prefix)();
+
+    while (precedence <= getRule(parser.current.type).precedence) {
+        parser.advance();
+        ParseFn infix = getRule(parser.previous.type).infix;
+        (this->*infix)();
+    }
+}
+
+ParseRule Compiler::getRule(TokenType type) {
+    return rules.at(type);
 }
 
 void Compiler::errorAt(const Token& token, std::string_view msg) {
-    if (parser.panic_mode) return;
-    parser.panic_mode = true;
-
-    std::cerr << "[line " << token.line << "] Error";
-
-    switch (token.type) {
-        case TokenType::END_OF_FILE:
-            std::cerr << " at end";
-            break;
-        case TokenType::ERROR:
-            break;
-        default:
-            std::cerr << " at '" << token.lexeme << "'";
-            break;
-    }
-
-    std::cerr << ": " << msg << "\n";
-
+    std::cerr << "[line " << token.line << "] Error at '"
+              << token.lexeme << "': " << msg << "\n";
     parser.had_error = true;
 }
 
-
 void Compiler::error(std::string_view msg) {
-    errorAt(parser.previous, msg);
+    std::cerr << "Error: " << msg << "\n";
+    parser.had_error = true;
 }
 
 void Compiler::errorAtCurrent(std::string_view msg) {
