@@ -1,6 +1,8 @@
 #include "compiler.h"
 #include <iostream>
 #include <cstdlib>
+#include "obj.h"
+#include "value.h"
  
 const std::unordered_map<TokenType, ParseRule> Compiler::rules = {
     { TokenType::LEFT_PAREN,    { &Compiler::grouping, nullptr, Precedence::NONE } },
@@ -27,7 +29,7 @@ const std::unordered_map<TokenType, ParseRule> Compiler::rules = {
     { TokenType::LESS_EQUAL,    { nullptr, &Compiler::binary, Precedence::COMPARISON } },
 
     { TokenType::IDENTIFIER,    { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::STRING,        { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::STRING,        { &Compiler::string, nullptr, Precedence::NONE } },
     { TokenType::NUMBER,        { &Compiler::number, nullptr, Precedence::NONE } },
 
     { TokenType::AND,           { nullptr, nullptr, Precedence::NONE } },
@@ -100,6 +102,16 @@ void Compiler::number() {
     double value = std::stod(std::string(parser.previous.lexeme));
     emitConstant(Value(value));
 }
+
+void Compiler::string() {
+    std::string raw = parser.previous.lexeme;
+    if (raw.size() >= 2) {
+        raw = raw.substr(1, raw.size() - 2);
+    }
+
+    emitConstant(makeObj<ObjString>(raw));
+}
+
 
 void Compiler::unary() {
     TokenType opType = parser.previous.type;

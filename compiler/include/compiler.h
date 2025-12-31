@@ -31,6 +31,7 @@ private:
 
     // Parsing functions (Compiler member functions)
     void number();
+    void string();
     void unary();
     void binary();
     void literal();

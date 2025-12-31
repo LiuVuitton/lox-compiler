@@ -32,6 +32,7 @@ private:
     Value pop();
     Value peek(int distance);
     bool isFalsey(const Value& value);
+    void concatenate();
     
     template <typename Op>
     void binaryOp(Op op) {

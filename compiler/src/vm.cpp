@@ -2,6 +2,7 @@
 #include "debug.h"
 #include <iostream>
 #include "compiler.h"
+#include "obj.h"
 
 
 InterpretResult VM::run() {
@@ -53,7 +54,15 @@ InterpretResult VM::run() {
                 break;
 
             case OpCode::ADD:
-                binaryOp(std::plus<>());
+                if (isObjType<ObjString>(peek(0)) && isObjType<ObjString>(peek(1))) {
+                    concatenate();
+                }
+                else if (isNumber(peek(0)) && isNumber(peek(1))) {
+                    binaryOp(std::plus<>());
+                }
+                else {
+                    runtimeError("Operands must be two numbers of two strings.");
+                }
                 break;
 
             case OpCode::SUBTRACT:
@@ -138,6 +147,11 @@ bool VM::isFalsey(const Value& value) {
     return isNil(value) || (isBool(value) && !asBool(value));
 }
 
+void VM::concatenate() {
+    ObjString* b = asObj<ObjString>(pop());
+    ObjString* a = asObj<ObjString>(pop());
+    push(makeObj<ObjString>(a->value + b->value));
+}
 
 void VM::resetStack() {
     stack.clear();

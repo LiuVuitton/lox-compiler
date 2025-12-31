@@ -1,5 +1,6 @@
 #include "value.h"
 #include <iostream>
+#include "obj.h"
 
 void ValueArray::write(const Value& value) {
     values.push_back(value);
@@ -14,6 +15,12 @@ size_t ValueArray::size() const {
 }
 
 bool valuesEqual(const Value& a, const Value& b) {
+    if (std::holds_alternative<std::shared_ptr<OBJ>>(a)) {
+        auto& objA = std::get<std::shared_ptr<OBJ>>(a);
+        auto& objB = std::get<std::shared_ptr<OBJ>>(b);
+        if (!objA || !objB) return false;
+        return objA->equals(*objB);
+    }
     return a == b; // This is possible because std::variant already implements == operator.
 }
 
@@ -25,6 +32,8 @@ void printValue(const Value& value) {
         std::cout << (std::get<bool>(value) ? "true" : "false");
     else if (std::holds_alternative<double>(value))
         std::cout << std::get<double>(value);
+    else if (std::holds_alternative<std::shared_ptr<OBJ>>(value)) 
+        printObject(value);
 }
 
 Value makeNil() {
