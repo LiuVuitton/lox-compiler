@@ -1,14 +1,21 @@
 #pragma once
 #include <cstdint>
 #include <vector>
-#include "value_array.h"
+#include "value.h"
 
 enum class OpCode : uint8_t {
     CONSTANT,
+    NIL,
+    TRUE,
+    FALSE,
+    EQUAL,
+    GREATER,
+    LESS,
     ADD,
     SUBTRACT,
     MULTIPLY,
     DIVIDE,
+    NOT,
     NEGATE,
     RETURN,
 };

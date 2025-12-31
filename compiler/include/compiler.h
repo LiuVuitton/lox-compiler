@@ -33,6 +33,7 @@ private:
     void number();
     void unary();
     void binary();
+    void literal();
     void grouping();
     void expression();
     void parsePrecedence(Precedence precedence);

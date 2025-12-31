@@ -17,14 +17,14 @@ const std::unordered_map<TokenType, ParseRule> Compiler::rules = {
     { TokenType::SLASH,         { nullptr, &Compiler::binary, Precedence::FACTOR } },
     { TokenType::STAR,          { nullptr, &Compiler::binary, Precedence::FACTOR } },
 
-    { TokenType::BANG,          { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::BANG_EQUAL,    { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::BANG,          { &Compiler::unary, nullptr, Precedence::NONE } },
+    { TokenType::BANG_EQUAL,    { nullptr, &Compiler::binary, Precedence::EQUALITY } },
     { TokenType::EQUAL,         { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::EQUAL_EQUAL,   { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::GREATER,       { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::GREATER_EQUAL, { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::LESS,          { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::LESS_EQUAL,    { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::EQUAL_EQUAL,   { nullptr, &Compiler::binary, Precedence::EQUALITY } },
+    { TokenType::GREATER,       { nullptr, &Compiler::binary, Precedence::COMPARISON } },
+    { TokenType::GREATER_EQUAL, { nullptr, &Compiler::binary, Precedence::COMPARISON } },
+    { TokenType::LESS,          { nullptr, &Compiler::binary, Precedence::COMPARISON } },
+    { TokenType::LESS_EQUAL,    { nullptr, &Compiler::binary, Precedence::COMPARISON } },
 
     { TokenType::IDENTIFIER,    { nullptr, nullptr, Precedence::NONE } },
     { TokenType::STRING,        { nullptr, nullptr, Precedence::NONE } },
@@ -33,17 +33,17 @@ const std::unordered_map<TokenType, ParseRule> Compiler::rules = {
     { TokenType::AND,           { nullptr, nullptr, Precedence::NONE } },
     { TokenType::CLASS,         { nullptr, nullptr, Precedence::NONE } },
     { TokenType::ELSE,          { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::FALSE,         { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::FALSE,         {&Compiler::literal, nullptr, Precedence::NONE} },
     { TokenType::FOR,           { nullptr, nullptr, Precedence::NONE } },
     { TokenType::FUN,           { nullptr, nullptr, Precedence::NONE } },
     { TokenType::IF,            { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::NIL,           { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::NIL,           { &Compiler::literal, nullptr, Precedence::NONE } },
     { TokenType::OR,            { nullptr, nullptr, Precedence::NONE } },
     { TokenType::PRINT,         { nullptr, nullptr, Precedence::NONE } },
     { TokenType::RETURN,        { nullptr, nullptr, Precedence::NONE } },
     { TokenType::SUPER,         { nullptr, nullptr, Precedence::NONE } },
     { TokenType::THIS,          { nullptr, nullptr, Precedence::NONE } },
-    { TokenType::TRUE,          { nullptr, nullptr, Precedence::NONE } },
+    { TokenType::TRUE,          {&Compiler::literal, nullptr, Precedence::NONE} },
     { TokenType::VAR,           { nullptr, nullptr, Precedence::NONE } },
     { TokenType::WHILE,         { nullptr, nullptr, Precedence::NONE } },
 
@@ -98,7 +98,7 @@ void Compiler::endCompiler() {
 
 void Compiler::number() {
     double value = std::stod(std::string(parser.previous.lexeme));
-    emitConstant(value);
+    emitConstant(Value(value));
 }
 
 void Compiler::unary() {
@@ -107,7 +107,8 @@ void Compiler::unary() {
     parsePrecedence(Precedence::UNARY);
 
     switch (opType) {
-        case TokenType::MINUS: emitByte(OpCode::NEGATE); break;
+        case TokenType::BANG:   emitByte(OpCode::NOT); break;
+        case TokenType::MINUS:  emitByte(OpCode::NEGATE); break;
         default: break;
     }
 }
@@ -118,11 +119,27 @@ void Compiler::binary() {
     parsePrecedence(static_cast<Precedence>(static_cast<int>(rule.precedence) + 1));
 
     switch (op_type) {
-        case TokenType::PLUS: emitByte(OpCode::ADD); break;
-        case TokenType::MINUS: emitByte(OpCode::SUBTRACT); break;
-        case TokenType::STAR: emitByte(OpCode::MULTIPLY); break;
-        case TokenType::SLASH: emitByte(OpCode::DIVIDE); break;
+        case TokenType::BANG_EQUAL:     emitBytes(OpCode::EQUAL, OpCode::NOT); break;
+        case TokenType::EQUAL_EQUAL:    emitByte(OpCode::EQUAL); break;
+        case TokenType::GREATER:        emitByte(OpCode::GREATER); break;
+        case TokenType::GREATER_EQUAL:  emitBytes(OpCode::LESS, OpCode::NOT); break;
+        case TokenType::LESS:           emitByte(OpCode::LESS); break;
+        case TokenType::LESS_EQUAL:     emitBytes(OpCode::GREATER, OpCode::NOT); break;
+        case TokenType::PLUS:           emitByte(OpCode::ADD); break;
+        case TokenType::MINUS:          emitByte(OpCode::SUBTRACT); break;
+        case TokenType::STAR:           emitByte(OpCode::MULTIPLY); break;
+        case TokenType::SLASH:          emitByte(OpCode::DIVIDE); break;
         default: break;
+    }
+}
+
+void Compiler::literal() {
+    switch (parser.previous.type) {
+        case TokenType::FALSE:  emitByte(OpCode::FALSE); break;
+        case TokenType::NIL:    emitByte(OpCode::NIL); break;
+        case TokenType::TRUE:   emitByte(OpCode::TRUE); break;
+        default:
+            return;
     }
 }
 

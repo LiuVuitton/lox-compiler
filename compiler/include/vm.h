@@ -28,14 +28,18 @@ public:
 private:
     uint8_t readByte();
     const Value& readConstant();
-    void resetStack();
     void push(const Value& value);
     Value pop();
+    Value peek(int distance);
+    bool isFalsey(const Value& value);
     
     template <typename Op>
     void binaryOp(Op op) {
-        double b = pop();
-        double a = pop();
-        push(Value{op(a, b)});
+        double b = asNumber(pop());
+        double a = asNumber(pop());
+        push(makeNumber(op(a, b)));
     }
+
+    void resetStack();
+    void runtimeError(const std::string& message);
 };

@@ -25,6 +25,33 @@ InterpretResult VM::run() {
                 break;
             }
 
+            case OpCode::NIL:
+                push(makeNil());
+                break;
+
+            case OpCode::TRUE:
+                push(makeBool(true));
+                break;
+
+            case OpCode::FALSE:
+                push(makeBool(false));
+                break;
+
+            case OpCode::EQUAL: {
+                Value b = pop();
+                Value a = pop();
+                push(makeBool(valuesEqual(a, b)));
+                break;
+            }
+
+            case OpCode::GREATER:
+                binaryOp(std::greater<>());
+                break;
+
+            case OpCode::LESS:
+                binaryOp(std::less<>());
+                break;
+
             case OpCode::ADD:
                 binaryOp(std::plus<>());
                 break;
@@ -41,8 +68,16 @@ InterpretResult VM::run() {
                 binaryOp(std::divides<>());
                 break;
 
+            case OpCode::NOT:
+                push(makeBool(isFalsey(pop())));
+                break;
+
             case OpCode::NEGATE: 
-                push(-pop());
+                if (!isNumber(peek(0))) {
+                    runtimeError("Operand must be a number.");
+                    return InterpretResult::RUNTIME_ERROR;
+                }
+                push(-asNumber(pop()));
                 break;
             
             case OpCode::RETURN: 
@@ -95,6 +130,26 @@ Value VM::pop() {
     return value;
 }
 
+Value VM::peek(int distance) {
+    return stack[stack.size() - 1 - distance];
+}
+
+bool VM::isFalsey(const Value& value) {
+    return isNil(value) || (isBool(value) && !asBool(value));
+}
+
+
 void VM::resetStack() {
     stack.clear();
+}
+
+void VM::runtimeError(const std::string& message) {
+    std::cerr << message << '\n';
+
+    // Compute instruction index
+    size_t instruction = ip - 1;
+    int line = chunk->lines[instruction];
+    std::cerr << "[line " << line << "] in script\n";
+
+    resetStack();
 }
